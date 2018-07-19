@@ -1,7 +1,8 @@
 import React from 'react'
+import { NavLink } from 'react-router-dom'
 import { Badge, Button, Input, Table } from 'antd'
 import BreadTitle from '../common/bread-title'
-import AppSelect from '../apps/app-select'
+import AppSelect from '../apps/app.select'
 import JobOperate from './job.operate'
 import JobInstanceDetail from './job.instance.detail'
 import { Ajax } from '../common/ajax'
@@ -170,8 +171,9 @@ class JobControls extends React.Component {
           columns={[
             {title: t('id'), dataIndex: 'id', key: 'id', width: '5%'},
             {
-              title: t('jobs.class'), dataIndex: 'clazz', key: 'clazz',
-              render: (text) => <code>{text}</code>
+              title: t('jobs.class'), dataIndex: 'clazz', key: 'clazz', render (text, job) {
+                return <NavLink to={'/job-instances?jobClass=' + job.clazz}><code>{text}</code></NavLink>
+              }
             },
             {title: t('jobs.fire.time.prev'), dataIndex: 'prevFireTime', key: 'prevFireTime'},
             {title: t('jobs.fire.time'), dataIndex: 'fireTime', key: 'fireTime', width: '13%'},

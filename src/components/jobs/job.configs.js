@@ -1,7 +1,7 @@
 import { Button, Divider, Dropdown, Icon, Input, Menu, Switch, Table } from 'antd'
 import { NavLink } from 'react-router-dom'
 import BreadTitle from '../common/bread-title'
-import AppSelect from '.././apps/app-select'
+import AppSelect from '../apps/app.select'
 import JobEdit from './job.edit'
 import JobOperate from './job.operate'
 import JobDependence from './job.dependence'

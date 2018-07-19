@@ -1,7 +1,7 @@
 import { Button, Input, Table, message } from 'antd'
 import BreadTitle from '../common/bread-title'
 import JobInstanceDetail from './job.instance.detail'
-import AppSelect from '../apps/app-select'
+import AppSelect from '../apps/app.select'
 import React from 'react'
 import { Ajax } from '../common/ajax'
 import qs from 'query-string'

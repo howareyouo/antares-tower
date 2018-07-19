@@ -3,7 +3,7 @@ import {Link, withRouter} from 'react-router-dom'
 import React, {Component} from 'react'
 import t, {lang, language} from '../../i18n'
 
-import './layout-header.less'
+import './layout.header.less'
 
 const {Header} = Layout
 const SubMenu = Menu.SubMenu
