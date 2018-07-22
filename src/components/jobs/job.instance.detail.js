@@ -1,75 +1,26 @@
 import { Button, Form, Modal, Progress, Table, Tabs } from 'antd'
 import React from 'react'
-import { Ajax } from '../common/ajax'
+import http from '../common/http'
 import t from '../../i18n'
-
 import './job.instance.detail.less'
 
 const TabPane = Tabs.TabPane
 const FormItem = Form.Item
+const itemLayout = {
+  wrapperCol: {span: 15},
+  labelCol: {span: 6}
+}
 
 export default class JobInstanceDetail extends React.Component {
 
-  constructor (props) {
-    super(props)
-    this.state = {
-      detail: {},
-      loadingShards: false,
-      shards: [],
-      pageSize: 10,
-      firstLoad: false,
-      intervalId: null,
-      pagination: {}
-    }
-  }
-
-  loadDetail () {
-
-    // const jobId = this.props.job.id;
-
-    const requestUri = this.props.uri
-    const firstLoad = this.state.firstLoad
-    const self = this
-
-    Ajax.get(requestUri, {}, function (instanceDetail) {
-
-      self.setState({
-        detail: instanceDetail,
-        firstLoad: true
-      })
-
-      if (!firstLoad) {
-
-        // first load the shards
-        self.loadShards(1)
-
-        if (instanceDetail.finishPercent < 100) {
-          // load detail interval
-          const interId = setInterval(self.loadDetail, 5000)
-          self.setState({
-            intervalId: interId
-          })
-        }
-      }
-
-      // clear interval if finished
-      if (instanceDetail.finishPercent === 100) {
-        // clearInterval(self.state.intervalId);
-        self.stopLoadDetail()
-      }
-
-    }, function (err) {
-      // stop load detail
-      self.stopLoadDetail()
-      // callback parent failed
-      self.props.onFailed && self.props.onFailed()
-    })
-  }
-
-  stopLoadDetail () {
-    if (this.state.intervalId) {
-      clearInterval(this.state.intervalId)
-    }
+  state = {
+    loadingShards: false,
+    pagination: {},
+    firstLoad: false,
+    pageSize: 10,
+    visible: true,
+    detail: {},
+    shards: []
   }
 
   loadShards (pageNo) {
@@ -79,15 +30,11 @@ export default class JobInstanceDetail extends React.Component {
       return
     }
 
+    const pageSize = this.state.pageSize
     const self = this
 
     self.setState({loadingShards: true})
-
-    const pageSize = this.state.pageSize
-    Ajax.get('/api/jobs/instances/' + instanceId + '/shards', {
-      pageNo: pageNo,
-      pageSize: pageSize
-    }, function (jsonData) {
+    http.get('/api/jobs/instances/' + instanceId + '/shards', {pageNo, pageSize}).then(function (jsonData) {
       var d = jsonData
       self.setState({
         loadingShards: false,
@@ -102,30 +49,77 @@ export default class JobInstanceDetail extends React.Component {
     })
   }
 
+  loadDetail () {
+
+    // const jobId = this.props.job.id
+
+    const requestUri = this.props.uri
+    const firstLoad = this.state.firstLoad
+    const self = this
+
+    http.get(requestUri).then(function (instanceDetail) {
+
+      self.setState({
+        detail: instanceDetail,
+        firstLoad: true
+      })
+
+      if (!firstLoad) {
+
+        // first load the shards
+        self.loadShards(1)
+
+        if (instanceDetail.finishPercent < 100) {
+          // load detail interval
+          self.intervalId = setInterval(self.loadDetail, 5000)
+        }
+      }
+
+      // clear interval if finished
+      if (instanceDetail.finishPercent === 100) {
+        // clearInterval(self.state.intervalId);
+        self.stopLoadDetail()
+      }
+
+    }, self.stopLoadDetail)
+  }
+
+  stopLoadDetail = () => {
+    if (this.state.intervalId) {
+      clearInterval(this.state.intervalId)
+    }
+  }
+
   componentDidMount () {
     this.loadDetail()
   }
 
-  onRefreshShards () {
+  componentWillUnmount () {
+    this.stopLoadDetail()
+  }
+
+  onRefreshShards = () => {
     const curPage = this.state.pagination.current || 1
     if (curPage) {
       this.loadShards(curPage)
     }
   }
 
-  handleCancel () {
-    if (this.state.intervalId) {
-      clearInterval(this.state.intervalId)
-    }
-    this.props.onCanceled && this.props.onCanceled()
+  onCancel = () => {
+    this.callback = this.props.onCanceled
+    this.setState({visible: false})
   }
 
-  onShardsPageChange (p) {
+  afterClose = () => {
+    this.callback && this.callback()
+  }
+
+  onShardsPageChange = (p) => {
+    console.log(p)
     this.loadShards(p.current)
   }
 
-  renderShardExtra (shard) {
-
+  renderShardExtra = (shard) => {
     return (
       <table className="shard-extra-table">
         <tbody>
@@ -153,12 +147,12 @@ export default class JobInstanceDetail extends React.Component {
           <th>{t('end.time')}</th>
           <td>{shard.endTime}</td>
         </tr>
-        {shard.status === 3 ? (
+        {shard.status === 3 && (
           <tr>
             <th>{t('error.info')}</th>
             <td>{shard.cause}</td>
           </tr>
-        ) : null}
+        )}
         </tbody>
       </table>
     )
@@ -166,36 +160,32 @@ export default class JobInstanceDetail extends React.Component {
 
   render () {
 
-    const detail = this.state.detail
-    const layout = {
-      wrapperCol: {span: 15},
-      labelCol: {span: 6}
-    }
+    const {detail, visible, loadingShards, pagination, shards} = this.state
 
     return (
       <Modal
         title={t('jobs.instance.detail')}
         wrapClassName="vertical-center-modal"
-        onCancel={() => this.handleCancel()}
-        closable={true}
-        visible={true}
+        afterClose={this.afterClose}
+        onCancel={this.onCancel}
+        visible={visible}
         width={580}
-        footer={<Button size="large" onClick={() => this.handleCancel()}>{t('close')}</Button>}>
+        footer={<Button size="large" onClick={this.onCancel}>{t('close')}</Button>}>
 
         <Tabs defaultActiveKey="1" type="card">
           <TabPane tab={t('jobs.instance.running.info')} key="1">
             <Form>
-              <FormItem className="mb-0" {...layout} label={t('jobs.instance.finish.percent')}>
+              <FormItem className="mb-0" {...itemLayout} label={t('jobs.instance.finish.percent')}>
                 <Progress status={detail.finishPercent < 100 ? 'active' : 'normal'} percent={detail.finishPercent}/>
               </FormItem>
-              <FormItem className="mb-0" {...layout} label={t('status')}>{detail.statusDesc}</FormItem>
-              <FormItem className="mb-0" {...layout} label={t('start.time')}>{detail.startTime}</FormItem>
-              <FormItem className="mb-0" {...layout} label={t('end.time')}>{detail.endTime}</FormItem>
-              <FormItem className="mb-0" {...layout} label={t('jobs.instance.total.shard.count')}>{detail.totalShardCount}</FormItem>
-              <FormItem className="mb-0" {...layout} label={t('jobs.instance.wait.shard.count')}>{detail.waitShardCount}</FormItem>
-              <FormItem className="mb-0" {...layout} label={t('jobs.instance.running.shard.count')}>{detail.runningShardCount}</FormItem>
-              <FormItem className="mb-0" {...layout} label={t('jobs.instance.success.shard.count')}>{detail.successShardCount}</FormItem>
-              <FormItem className="mb-0" {...layout} label={t('jobs.instance.failed.shard.count')}>{detail.failedShardCount}</FormItem>
+              <FormItem className="mb-0" {...itemLayout} label={t('status')}>{detail.statusDesc}</FormItem>
+              <FormItem className="mb-0" {...itemLayout} label={t('start.time')}>{detail.startTime}</FormItem>
+              <FormItem className="mb-0" {...itemLayout} label={t('end.time')}>{detail.endTime}</FormItem>
+              <FormItem className="mb-0" {...itemLayout} label={t('jobs.instance.total.shard.count')}>{detail.totalShardCount}</FormItem>
+              <FormItem className="mb-0" {...itemLayout} label={t('jobs.instance.wait.shard.count')}>{detail.waitShardCount}</FormItem>
+              <FormItem className="mb-0" {...itemLayout} label={t('jobs.instance.running.shard.count')}>{detail.runningShardCount}</FormItem>
+              <FormItem className="mb-0" {...itemLayout} label={t('jobs.instance.success.shard.count')}>{detail.successShardCount}</FormItem>
+              <FormItem className="mb-0" {...itemLayout} label={t('jobs.instance.failed.shard.count')}>{detail.failedShardCount}</FormItem>
             </Form>
           </TabPane>
 
@@ -213,11 +203,11 @@ export default class JobInstanceDetail extends React.Component {
                   )
                 }
               ]}
-              loading={this.state.loadingShards}
-              pagination={this.state.pagination}
-              dataSource={this.state.shards}
+              pagination={pagination}
+              dataSource={shards}
+              loading={loadingShards}
               expandedRowRender={(record) => this.renderShardExtra(record)}
-              onChange={() => this.onShardsPageChange()}
+              onChange={(p) => this.onShardsPageChange(p)}
               size="middle"
               rowKey="id"
             />

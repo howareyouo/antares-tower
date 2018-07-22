@@ -1,18 +1,16 @@
-import { Button, message, Modal, Table } from 'antd'
-import { Ajax } from '../common/ajax'
+import { message, Modal, Table } from 'antd'
+import http from '../common/http'
 import React from 'react'
 import t from '../../i18n'
 
 class JobAssign extends React.Component {
 
-  constructor (props) {
-    super(props)
-    this.state = {
-      loading: false,
-      submitting: false,
-      assigns: [],
-      assignIps: []
-    }
+  state = {
+    submitting: false,
+    assignIps: [],
+    assigns: [],
+    loading: false,
+    visible: true
   }
 
   componentDidMount () {
@@ -21,7 +19,7 @@ class JobAssign extends React.Component {
     const self = this
 
     self.setState({loading: true})
-    Ajax.get('/api/jobs/' + job.id + '/assigns', {}, function (assignDatas) {
+    http.get('/api/jobs/' + job.id + '/assigns').then(function (assignDatas) {
 
       var tmpAssignIps = []
       if (assignDatas) {
@@ -40,31 +38,38 @@ class JobAssign extends React.Component {
     })
   }
 
-  handleCancel () {
-    this.props.onCanceled && this.props.onCanceled()
+  onCancel = () => {
+    this.callback = this.props.onCanceled
+    this.setState({visible: false})
   }
 
-  handleSubmit () {
-
+  onOk = () => {
     const self = this
-
     var assignIpsStr = self.state.assignIps.length > 0 ? self.state.assignIps.join(',') : '-1'
 
     // start submiting
     self.setState({submitting: true})
-    Ajax.post('/api/jobs/' + self.props.job.id + '/assigns', {'assignIps': assignIpsStr}, function (jsonData) {
+    http.post('/api/jobs/' + self.props.job.id + '/assigns', {'assignIps': assignIpsStr}, function (jsonData) {
 
       // stop submiting when post finished
-      self.setState({submitting: false})
+      this.callback = this.props.onCanceled
+      self.setState({
+        submitting: false,
+        visible: false
+      })
       // success tip
       message.success(t('operate.success'))
-      self.handleCancel()
     }, function (err) {
       message.error(err)
     })
   }
 
-  renderAssignProc (record) {
+  afterClose = () => {
+    this.callback && this.callback()
+  }
+
+  renderAssignProc = (record) => {
+
     if (!record.processes) {
       return null
     }
@@ -83,22 +88,19 @@ class JobAssign extends React.Component {
 
     const self = this
     const job = this.props.job
-    const assigns = this.state.assigns
-    const title = t('jobs.assign', job.clazz)
+    const {assigns, visible, submitting} = this.state
 
     return (
       <Modal
-        title={title}
+        title={t('jobs.assign', job.clazz)}
         wrapClassName="vertical-center-modal"
-        visible={true}
-        onCancel={() => this.handleCancel()}
-        closable={true}
-        footer={[
-          <Button key="back" type="ghost" size="large" onClick={() => this.handleCancel()}>{t('cancel')}</Button>,
-          <Button key="submit" type="primary" size="large" loading={this.state.submitting} onClick={() => this.handleSubmit()}>
-            {t('submit')}
-          </Button>
-        ]}>
+        confirmLoading={submitting}
+        afterClose={this.afterClose}
+        cancelText={t('cancel')}
+        onCancel={this.onCancel}
+        visible={visible}
+        okText={t('submit')}
+        onOk={this.onOk}>
 
         <Table
           columns={[

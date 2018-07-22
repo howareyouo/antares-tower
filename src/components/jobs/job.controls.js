@@ -5,7 +5,7 @@ import BreadTitle from '../common/bread-title'
 import AppSelect from '../apps/app.select'
 import JobOperate from './job.operate'
 import JobInstanceDetail from './job.instance.detail'
-import { Ajax } from '../common/ajax'
+import http from '../common/http'
 import t from '../../i18n'
 import { states } from '../common/constans'
 
@@ -37,12 +37,7 @@ class JobControls extends React.Component {
 
     const pageSize = this.state.pageSize
 
-    Ajax.get('/api/jobs/controls', {
-      appId: appId,
-      jobClass: jobClass,
-      pageNo: pageNo,
-      pageSize: pageSize
-    }, function (jsonData) {
+    http.get('/api/jobs/controls', {appId, jobClass, pageNo, pageSize}).then(function (jsonData) {
       var d = jsonData
       self.setState({
         loading: false,
@@ -152,7 +147,7 @@ class JobControls extends React.Component {
 
         <BreadTitle firstCode="jobs.mgr" secondCode="jobs.controls"/>
 
-        <div className="oplist">
+        <div>
 
           <AppSelect onChange={(val) => this.onAppChange(val)}/>
 

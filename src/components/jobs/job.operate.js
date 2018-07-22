@@ -1,70 +1,61 @@
-import React from 'react'
+import { message, Modal } from 'antd'
 import PropTypes from 'prop-types'
-import { Button, message, Modal } from 'antd'
-import { Ajax } from '../common/ajax'
+import React from 'react'
+import http from '../common/http'
 import t from '../../i18n'
 
-class JobOperate extends React.Component {
+class JobOperate extends React.PureComponent {
 
-  constructor (props) {
-    super(props)
-    this.state = {
-      confirming: false
-    }
+  state = {
+    confirming: false,
+    visible: true
   }
 
-  handleSubmit () {
-
-    const self = this
-    const operate = this.props.operate
-    const suffix = this.props.suffix || ''
-    const jobId = this.props.job.id
-    const uri = '/api/jobs/' + jobId + '/' + operate + (suffix ? '/' + suffix : '')
+  onOk = () => {
+    const {operate, suffix, job} = this.props
+    const uri = '/api/jobs/' + job.id + '/' + operate + (suffix ? '/' + suffix : '')
 
     // start submiting
-    self.setState({confirming: true})
-
-    Ajax.post(uri, {}, function (jsonData) {
+    this.setState({confirming: true})
+    http.post(uri).then(() => {
 
       // stop submiting when post finished
-      self.setState({confirming: false})
-      message.success(t('operate.success'));
-
-      // callback parent submit
-      (self.props.onSubmitted && self.props.onSubmitted())
-    }, function (err) {
-      // callback parent failed
-      (self.props.onFailed && self.props.onFailed())
+      this.setState({
+        confirming: false,
+        visible: false
+      })
+      message.success(t('operate.success'))
+      this.callback = this.props.onSubmitted
+    }, () => {
+      this.callback = this.props.onFailed
     })
   }
 
-  handleCancel () {
+  afterClose = () => {
     // callback parent
-    this.props.onCanceled && this.props.onCanceled()
+    this.callback && this.callback()
+  }
+
+  onCancel = () => {
+    this.callback = this.props.onCanceled
+    this.setState({visible: false})
   }
 
   render () {
-
-    const job = this.props.job
-    const operate = this.props.operate
+    const {operate} = this.props
+    const {visible, confirming} = this.state
 
     return (
-
       <Modal
         title={t('jobs.' + operate)}
         wrapClassName="vertical-center-modal"
-        visible={true}
-        onOk={() => this.handleSubmit()}
-        onCancel={() => this.handleCancel()}
-        okText={t('confirm')}
+        afterClose={this.afterClose}
         cancelText={t('cancel')}
-        closable={true}
-        footer={[
-          <Button key="back" type="ghost" size="large" onClick={() => this.handleCancel()}>{t('cancel')}</Button>,
-          <Button key="submit" type="primary" size="large" loading={this.state.confirming} onClick={() => this.handleSubmit()}>
-            {t('confirm')}
-          </Button>
-        ]}>
+        onCancel={this.onCancel}
+        okText={t('confirm')}
+        onOk={this.onOk}
+        visible={visible}
+        confirmLoading={confirming}>
         {t('jobs.' + operate + '.confirm')}
       </Modal>
     )

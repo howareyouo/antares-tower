@@ -2,7 +2,7 @@ import React from 'react'
 import { Button, Table } from 'antd'
 import AppSelect from '../apps/app.select'
 import BreadTitle from '../common/bread-title'
-import { Ajax } from '../common/ajax'
+import http from '../common/http'
 import t from '../../i18n'
 
 import './clients.less'
@@ -22,7 +22,7 @@ class Clients extends React.Component {
     const self = this
     self.setState({loading: true})
 
-    Ajax.get('/api/clients', {appId: appId}, function (clientsData) {
+    http.get('/api/clients', {appId: appId}).then(function (clientsData) {
       self.setState({
         loading: false,
         clients: clientsData,

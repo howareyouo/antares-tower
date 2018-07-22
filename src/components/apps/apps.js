@@ -1,8 +1,7 @@
 import React, { Component } from 'react'
-import { Breadcrumb, Button, Divider, Input, Table } from 'antd'
-import { Ajax } from '../common/ajax'
-import AppDelete from './app.delete'
+import { Breadcrumb, Button, Divider, Input, Modal, Table } from 'antd'
 import AppEdit from './app.edit'
+import http from '../common/http'
 import t from '../../i18n'
 
 const Search = Input.Search
@@ -12,7 +11,6 @@ export default class Apps extends Component {
     super(props)
     this.state = {
       searchAppName: '',
-      deletingApp: null,
       editingApp: null,
       pagination: false,
       pageSize: 10000, // load all apps
@@ -27,19 +25,16 @@ export default class Apps extends Component {
 
   loadApps (pageNo, appName) {
 
+    const pageSize = this.state.pageSize
     appName = appName || ''
 
-    const self = this
-
-    self.setState({loading: true})
-
-    const pageSize = this.state.pageSize
-    Ajax.get('/api/apps', {pageNo: pageNo, pageSize: pageSize, appName: appName}, function (jsonData) {
+    this.setState({loading: true})
+    http.get('/api/apps', {pageNo, pageSize, appName}).then(jsonData => {
       var d = jsonData
-      self.setState({
+      this.setState({
+        searchAppName: appName,
         loading: false,
         apps: d.data,
-        searchAppName: appName,
         pagination: {
           current: pageNo,
           total: d.total,
@@ -60,28 +55,40 @@ export default class Apps extends Component {
     })
   }
 
-  onRefresh () {
+  onRefresh = () => {
     this.loadApps(this.state.pagination.current, this.state.searchAppName)
   }
 
-  onEditSubmitted () {
+  onSubmitted = () => {
     this.setState({editingApp: null})
     this.loadApps(this.state.pagination.current)
   }
 
-  onDeleteSubmitted () {
-    this.setState({deletingApp: null})
-    this.loadApps(this.state.pagination.current)
+  deleteConfirm = (app) => {
+    const self = this
+    Modal.confirm({
+      title: t('apps.delete'),
+      content: t('apps.delete.confirm', app.appName),
+      okText: t('confirm'),
+      cancelText: t('cancel'),
+      maskClosable: true,
+      onOk () {
+        return new Promise((resolve, reject) => {
+          http.post('/api/apps/del', {appName: app.appName}).then(res => {
+            self.loadApps(self.state.pagination.current)
+            resolve()
+          }, reject)
+        })
+      }
+    })
   }
 
   render () {
 
     const self = this
-    const editingApp = this.state.editingApp
-    const deletingApp = this.state.deletingApp
+    const {editingApp, apps, loading, pagination} = this.state
 
     return (
-
       <div>
         <Breadcrumb>
           <Breadcrumb.Item>{t('apps.mgr')}</Breadcrumb.Item>
@@ -109,27 +116,24 @@ export default class Apps extends Component {
                   <span>
                     <a onClick={() => self.setState({editingApp: record})}>{t('update')}</a>
                     <Divider type="vertical"/>
-                    <a onClick={() => self.setState({deletingApp: record})}>{t('delete')}</a>
+                    <a onClick={() => self.deleteConfirm(record)}>{t('delete')}</a>
                   </span>
                 )
               }
             }
           ]}
-          dataSource={this.state.apps}
-          loading={this.state.loading}
-          pagination={this.state.pagination}
+          pagination={pagination}
+          dataSource={apps}
           onChange={(p) => this.loadApps(p.current)}
-          rowKey="id"
-        />
-        {editingApp === null ? null :
-          <AppEdit app={editingApp}
-                   onSubmitted={() => this.onEditSubmitted()}
-                   onCanceled={() => this.setState({editingApp: null})}/>}
+          loading={loading}
+          rowKey="id"/>
 
-        {deletingApp === null ? null :
-          <AppDelete app={deletingApp}
-                     onSubmitted={() => this.onDeleteSubmitted()}
-                     onCanceled={() => this.setState({deletingApp: null})}/>}
+        {editingApp &&
+        <AppEdit
+          app={editingApp}
+          onSubmitted={this.onSubmitted}
+          onCanceled={() => this.setState({editingApp: null})}
+        />}
       </div>
     )
   }

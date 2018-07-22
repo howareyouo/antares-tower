@@ -6,7 +6,7 @@ import JobEdit from './job.edit'
 import JobOperate from './job.operate'
 import JobDependence from './job.dependence'
 import JobAssign from './job.assign'
-import { Ajax } from '../common/ajax'
+import http from '../common/http'
 import React from 'react'
 import t from '../../i18n'
 
@@ -14,24 +14,21 @@ const Search = Input.Search
 
 class JobConfigs extends React.Component {
 
-  constructor (props) {
-    super(props)
-    this.state = {
-      dependencingJob: null,
-      operatingJob: null,
-      assigningJob: null,
-      editingJob: null,
-      searchJobClass: '',
-      pagination: false,
-      pageSize: 10,
-      loading: false,
-      appId: null,
-      operate: '',
-      jobs: []
-    }
+  state = {
+    dependencingJob: null,
+    operatingJob: null,
+    assigningJob: null,
+    editingJob: null,
+    searchJobClass: '',
+    pagination: false,
+    pageSize: 10,
+    loading: false,
+    appId: null,
+    operate: '',
+    jobs: []
   }
 
-  loadJobs (appId, pageNo, jobClass) {
+  loadJobs = (appId, pageNo, jobClass) => {
 
     jobClass = jobClass || ''
 
@@ -40,7 +37,7 @@ class JobConfigs extends React.Component {
 
     const pageSize = this.state.pageSize
 
-    Ajax.get('/api/jobs', {appId, jobClass, pageNo, pageSize}, function (jsonData) {
+    http.get('/api/jobs', {appId, jobClass, pageNo, pageSize}).then(function (jsonData) {
       var d = jsonData
       self.setState({
         loading: false,
@@ -60,64 +57,64 @@ class JobConfigs extends React.Component {
     })
   }
 
-  onPageChange (p) {
-    this.loadJobs(this.state.appId, p.current)
-  }
-
-  onAdd () {
-    this.setState({editingJob: {appId: this.state.appId}})
-  }
-
-  onRefresh () {
+  onRefresh = () => {
     const {appId, pagination, searchJobClass} = this.state
     this.loadJobs(appId, pagination.current, searchJobClass)
   }
 
-  onEditSubmitted () {
+  onPageChange = (p) => {
+    this.loadJobs(this.state.appId, p.current)
+  }
+
+  onAdd = () => {
+    this.setState({editingJob: {appId: this.state.appId}})
+  }
+
+  onEditSubmitted = () => {
     this.setState({editingJob: null})
     this.onRefresh()
   }
 
-  onEditFailed () {
+  onEditFailed = () => {
     this.setState({editingJob: null})
     this.onRefresh()
   }
 
-  onDelete (job) {
+  onDelete = (job) => {
     this.setState({operatingJob: job, operate: 'delete'})
   }
 
-  onOperateSubmitted () {
+  onOperateSubmitted = () => {
     this.setState({operatingJob: null, operate: ''})
     this.onRefresh()
   }
 
-  onOperateCanceled () {
+  onOperateCanceled = () => {
     this.setState({operatingJob: null, operate: ''})
   }
 
-  onOperateFailed () {
+  onOperateFailed = () => {
     this.setState({operatingJob: null, operate: ''})
     this.onRefresh()
   }
 
-  onAppChange (appId) {
+  onAppChange = (appId) => {
     this.loadJobs(appId, 1, this.state.searchJobClass)
   }
 
-  onStateChange (checked, job) {
+  onStateChange = (checked, job) => {
     var self = this
     var jobs = self.state.jobs
     job.operating = true
     self.setState({jobs})
-    Ajax.post('/api/jobs/' + job.id + (checked ? '/enable' : '/disable'), {}, function () {
+    http.post('/api/jobs/' + job.id + (checked ? '/enable' : '/disable')).then(function (res) {
       job.operating = false
       job.status = checked ? 1 : 0
       self.setState({jobs})
     })
   }
 
-  render () {
+  render = () => {
 
     const self = this
 
@@ -132,7 +129,7 @@ class JobConfigs extends React.Component {
       <div>
         <BreadTitle firstCode="jobs.mgr" secondCode="jobs.configs"/>
 
-        <div className="oplist">
+        <div>
 
           <AppSelect onChange={(val) => this.onAppChange(val)}/>
 
@@ -209,37 +206,28 @@ class JobConfigs extends React.Component {
               }
             }
           ]}
+          pagination={this.state.pagination}
           dataSource={this.state.jobs}
           loading={this.state.loading}
-          pagination={this.state.pagination}
           onChange={(p) => this.onPageChange(p)}
           rowKey="id"/>
 
-        {editingJob === null ? null :
-          <JobEdit job={editingJob}
-                   onSubmitted={() => this.onEditSubmitted()}
-                   onCanceled={() => this.setState({editingJob: null})}
-                   onFailed={() => this.onEditFailed()}/>}
+        {editingJob && <JobEdit
+          job={editingJob}
+          onSubmitted={this.onEditSubmitted}
+          onCanceled={() => this.setState({editingJob: null})}
+          onFailed={this.onEditFailed}/>}
 
-        {operatingJob === null ? null :
-          <JobOperate job={operatingJob}
-                      operate={operate}
-                      onSubmitted={() => this.onOperateSubmitted()}
-                      onCanceled={() => this.onOperateCanceled()}
-                      onFailed={() => this.onOperateFailed()}/>}
+        {operatingJob && <JobOperate
+          job={operatingJob}
+          operate={operate}
+          onSubmitted={() => this.onOperateSubmitted()}
+          onCanceled={() => this.onOperateCanceled()}
+          onFailed={() => this.onOperateFailed()}/>}
 
-        {dependencingJob === null ? null :
-          <JobDependence job={dependencingJob}
-                         onSubmitted={() => this.setState({dependencingJob: null})}
-                         onCanceled={() => this.setState({dependencingJob: null})}
-                         onFailed={() => this.onDependenceFailed()}/>}
+        {dependencingJob && <JobDependence job={dependencingJob} onSubmitted={() => this.setState({dependencingJob: null})}/>}
 
-        {assigningJob === null ? null :
-          <JobAssign job={assigningJob}
-                     onSubmitted={() => this.setState({assigningJob: null})}
-                     onCanceled={() => this.setState({assigningJob: null})}
-                     onFailed={() => this.onAssignFailed()}/>}
-
+        {assigningJob && <JobAssign job={assigningJob} onCanceled={() => this.setState({assigningJob: null})}/>}
       </div>
     )
   }

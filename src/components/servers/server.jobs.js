@@ -1,26 +1,20 @@
-import React from 'react'
 import { Button, Modal, Table } from 'antd'
-import { Ajax } from '../common/ajax'
+import React from 'react'
+import http from '../common/http'
 import t from '../../i18n'
 
-class ServerJobs extends React.Component {
+export default class ServerJobs extends React.Component {
 
-  constructor (props) {
-    super(props)
-    this.state = {
-      loading: false,
-      jobs: []
-    }
+  state = {
+    visible: true,
+    loading: false,
+    jobs: []
   }
 
   loadJobs () {
-
-    const server = this.props.server
-    const self = this
-
-    self.setState({loading: true})
-    Ajax.get('/api/servers/jobs', {server: server}, function (jobs) {
-      self.setState({
+    this.setState({loading: true})
+    http.get('/api/servers/jobs', {server: this.props.server}).then(jobs => {
+      this.setState({
         loading: false,
         jobs: jobs
       })
@@ -31,24 +25,27 @@ class ServerJobs extends React.Component {
     this.loadJobs()
   }
 
-  handleCancel () {
-    this.props.onCanceled && this.props.onCanceled()
+  onCancel = () => {
+    this.callback = this.props.onCanceled
+    this.setState({visible: false})
+  }
+
+  afterClose = () => {
+    this.callback && this.callback()
   }
 
   render () {
+    const {visible, jobs, loading} = this.state
 
     return (
       <Modal
         title={t('clusters.servers.jobs', this.props.server)}
         wrapClassName="vertical-center-modal"
-        onCancel={() => this.handleCancel()}
-        closable={true}
-        visible={true}
+        afterClose={this.afterClose}
+        onCancel={this.onCancel}
+        visible={visible}
         width={680}
-        footer={
-          <Button type="ghost" size="large" onClick={() => this.handleCancel()}>{t('close')}</Button>
-        }>
-
+        footer={<Button type="ghost" size="large" onClick={() => this.onCancel()}>{t('close')}</Button>}>
         <Table
           columns={[
             {title: t('id'), dataIndex: 'id', key: 'id'},
@@ -64,14 +61,12 @@ class ServerJobs extends React.Component {
             }
           ]}
           pagination={false}
-          dataSource={this.state.jobs}
-          loading={this.state.loading}
+          dataSource={jobs}
+          loading={loading}
           size="middle"
-          rowKey="id"/>
-
+          rowKey="id"
+        />
       </Modal>
     )
   }
 }
-
-export default ServerJobs

@@ -1,34 +1,30 @@
-import { Button, Input, Modal, Popconfirm, Table } from 'antd'
+import { Button, Input, Modal, Table } from 'antd'
 import React from 'react'
 import JobOperate from './job.operate'
-import { Ajax } from '../common/ajax'
+import http from '../common/http'
 import t from '../../i18n'
 
 class JobDependence extends React.Component {
 
-  constructor (props) {
-    super(props)
-    this.state = {
-      loading: false,
-      jobs: [],
-      pageSize: 10,
-      pagination: {},
-      addingJobIds: null,
-      operatingJob: null,
-      deletingJobId: null
-    }
+  state = {
+    deletingJobId: null,
+    addingJobIds: null,
+    operatingJob: null,
+    pagination: {},
+    loading: false,
+    visible: true,
+    pageSize: 10,
+    jobs: []
   }
 
   loadNextJobs (pageNo) {
 
+    const pageSize = this.state.pageSize
     const job = this.props.job
-
     const self = this
 
     self.setState({loading: true})
-
-    const pageSize = this.state.pageSize
-    Ajax.get('/api/jobs/' + job.id + '/next', {pageNo, pageSize}, function (jsonData) {
+    http.get('/api/jobs/' + job.id + '/next', {pageNo, pageSize}).then(function (jsonData) {
       var d = jsonData
       self.setState({
         loading: false,
@@ -47,61 +43,61 @@ class JobDependence extends React.Component {
     this.loadNextJobs(1)
   }
 
-  onRefreshNextJobs () {
+  onRefreshNextJobs = () => {
     this.loadNextJobs(this.state.pagination.current)
   }
 
-  handleCancel () {
-    this.props.onCanceled && this.props.onCanceled()
+  onCancel = () => {
+    this.callback = this.props.onSubmitted
+    this.setState({visible: false})
+  }
+
+  afterClose = () => {
+    // callback parent
+    this.callback && this.callback()
   }
 
   onPageChange (p) {
     this.loadNextJobs(p.current)
   }
 
-  nextJobIdsChange (e) {
+  nextJobIdsChange = (e) => {
     this.setState({
       addingJobIds: e.target.value
     })
   }
 
-  onAdd () {
-
-    const self = this
+  onAdd = () => {
     const jobId = this.props.job.id
     const addingJobIds = this.state.addingJobIds
 
-    Ajax.post('/api/jobs/' + jobId + '/next', {nextJobId: addingJobIds}, function (addResp) {
-      if (addResp) {
-        self.setState({
-          addingJobIds: null
-        })
-        self.onRefreshNextJobs()
+    http.post('/api/jobs/' + jobId + '/next', {nextJobId: addingJobIds}).then(res => {
+      if (res) {
+        this.setState({addingJobIds: null})
+        this.onRefreshNextJobs()
       }
     })
   }
 
   onDelete (nextJob) {
-
     const curJob = this.props.job
 
     this.setState({
       operatingJob: curJob,
       deletingJobId: nextJob.id
     })
-
   }
 
-  onDeleteSubmitted () {
+  onDeleteSubmitted = () => {
     this.setState({operatingJob: null, deletingJobId: null})
     this.onRefreshNextJobs()
   }
 
-  onDeleteCanceled () {
+  onDeleteCanceled = () => {
     this.setState({operatingJob: null, deletingJobId: null})
   }
 
-  onDeleteFailed () {
+  onDeleteFailed = () => {
     this.setState({operatingJob: null, deletingJobId: null})
     this.onRefreshNextJobs()
   }
@@ -113,36 +109,30 @@ class JobDependence extends React.Component {
     const title = t('jobs.dependence', job.clazz)
 
     // next job ids tip
-    const addingJobIds = this.state.addingJobIds
-    // the deleting next job
-    const operatingJob = this.state.operatingJob
-    const deletingJobId = this.state.deletingJobId
+    const {addingJobIds, operatingJob, deletingJobId, visible} = this.state
 
     return (
       <Modal
         title={title}
         wrapClassName="vertical-center-modal"
-        visible={true}
-        onCancel={() => this.handleCancel()}
-        closable={true}
+        afterClose={this.afterClose}
+        cancelText={t('close')}
+        onCancel={this.onCancel}
+        visible={visible}
         width={680}
-        footer={
-          <Button key="back" type="ghost" size="large" onClick={() => this.handleCancel()}>{t('close')}</Button>
-        }>
+        footer={<Button size="large" onClick={this.onCancel}>{t('close')}</Button>}>
 
-        <div className="oplist">
+        <Input.Search
+          className="mb-3"
+          placeholder={t('input') + t('jobs.next.ids')}
+          enterButton={t('add')}
+          onChange={(e) => this.nextJobIdsChange(e)}
+          onSearch={this.onAdd}
+          value={addingJobIds}
+          style={{width: 250}}
+        />
 
-          <Input.Search
-            placeholder={t('input') + t('jobs.next.ids')}
-            enterButton={t('add')}
-            style={{width: 250}}
-            onChange={(e) => this.nextJobIdsChange(e)}
-            onSearch={() => this.onAdd()}
-            value={addingJobIds}/>
-
-        </div>
         <Table
-          className="mt-3"
           columns={[
             {title: t('id'), dataIndex: 'id', key: 'id', width: '12%'},
             {title: t('apps.name'), dataIndex: 'appName', key: 'appName', width: '18%'},
@@ -161,9 +151,9 @@ class JobDependence extends React.Component {
           pagination={this.state.pagination}
           dataSource={this.state.jobs}
           loading={this.state.loading}
-          onChange={(p) => this.onPageChange(p)}
-          rowKey="id"
+          onChange={this.onPageChange}
           size="middle"
+          rowKey="id"
         />
 
         {operatingJob === null ? null :

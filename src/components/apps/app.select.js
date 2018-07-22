@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { Select } from 'antd'
-import { Ajax } from '../common/ajax'
+import http from '../common/http'
 import t from '../../i18n'
 
 const Option = Select.Option
@@ -19,17 +19,20 @@ export default class AppSelect extends Component {
     this.loadApps()
   }
 
+  onChange = (value) => {
+    this.setState({value})
+    this.props.onChange(value)
+  }
+
   loadApps () {
     const self = this
 
     // load all apps
-    Ajax.get('/api/apps', {pageNo: 1, pageSize: 10000}, function (response) {
-      var data = response.data
-      var state = {
-        apps: data
-      }
-      if (data.length) {
-        state.value = data[0].id
+    http.get('/api/apps', {pageNo: 1, pageSize: 10000}).then(response => {
+      var apps = response.data
+      var state = {apps}
+      if (apps.length) {
+        state.value = apps[0].id
         self.props.onChange(state.value)
       }
       self.setState(state)
@@ -38,15 +41,15 @@ export default class AppSelect extends Component {
 
   render () {
 
-    const apps = this.state.apps
+    const {apps, value} = this.state
 
     return (
       <Select style={{width: 220}}
-              value={this.state.value}
+              value={value}
               placeholder={t('apps.select')}
               optionFilterProp="children"
               notFoundContent={t('not.found')}
-              onChange={(value) => this.props.onChange(value)}
+              onChange={this.onChange}
               showSearch>
 
         {apps.map((app, index) => (

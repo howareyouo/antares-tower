@@ -1,78 +1,88 @@
-import { Button, Form, Input, InputNumber, Modal, Switch, Tabs } from 'antd'
+import { Form, Input, InputNumber, Modal, Switch, Tabs } from 'antd'
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Ajax } from '../common/ajax'
+import http from '../common/http'
 import t from '../../i18n'
 
 const TextArea = Input.TextArea
 const FormItem = Form.Item
 const TabPane = Tabs.TabPane
 
+const formItemLayout = {
+  labelCol: {span: 6},
+  wrapperCol: {span: 14}
+}
+
 class JobEdit extends React.Component {
 
-  constructor (props) {
-    super(props)
-    this.state = {
-      config: {
-        params: '',
-        shardCount: 1,
-        shardParams: '',
-        misfire: true,
-        maxShardPullCount: 3
-      },
-      submitting: false
+  state = {
+    submitting: false,
+    visible: true,
+    config: {
+      params: '',
+      shardCount: 1,
+      shardParams: '',
+      misfire: true,
+      maxShardPullCount: 3
     }
   }
 
-  handleSubmit () {
+  componentDidMount () {
+    this.loadConfig()
+  }
 
+  onOk = () => {
     const self = this
 
-    // start submiting
-    self.setState({submitting: true})
-
     // validate form
-    self.props.form.validateFields((errors, values) => {
-      if (!errors) {
+    self.props.form.validateFields((err, values) => {
+      if (err) {
+        return
+      }
 
-        const job = self.props.job
+      const job = self.props.job
 
-        // set app id
-        values.appId = job.appId
+      // set app id
+      values.appId = job.appId
+      // set job id
+      if (job.id) {
+        values.jobId = job.id
+      }
 
-        // set job id
-        if (job.id) {
-          values.jobId = job.id
-        }
+      // start submiting
+      self.setState({submitting: true})
+      // submit validated pass
+      http.post('/api/jobs', values).then(function (jsonData) {
 
-        // submit validated pass
-        Ajax.post('/api/jobs', values, function (jsonData) {
-
-          // stop submiting when post finished
-          self.setState({submitting: false});
-
-          // callback parent
-          (self.props.onSubmitted && self.props.onSubmitted())
-
-        }, function (err) {
-          // stop submiting when post finished
-          self.setState({submitting: false})
-          // (self.props.onFailed && self.props.onFailed());
+        // stop submiting when post finished
+        self.setState({
+          submitting: false,
+          visible: false
         })
 
-      } else {
-        // stop submiting when validate failed
+        // callback parent
+        self.callback = self.props.onSubmitted
+
+      }, function (err) {
+        // stop submiting when post finished
+        self.callback = self.props.onFailed
         self.setState({submitting: false})
-      }
+      })
+
     })
   }
 
-  handleCancel () {
-    // callback parent
-    this.props.onCanceled()
+  onCancel = () => {
+    this.callback = this.props.onCanceled
+    this.setState({visible: false})
   }
 
-  checkClassInput (rule, value, callback) {
+  afterClose = () => {
+    // parent callback
+    this.callback && this.callback()
+  }
+
+  checkClassInput = (rule, value, callback) => {
     if (/([a-z][a-z_0-9]*\.)*[A-Z_]($[A-Z_]|[\w_])*/.test(value)) {
       callback()
     } else {
@@ -80,41 +90,28 @@ class JobEdit extends React.Component {
     }
   }
 
-  loadConfig () {
+  loadConfig = () => {
 
     if (!this.props.job.id) {
       return
     }
-
     const self = this
     const jobId = this.props.job.id
 
-    Ajax.get('/api/jobs/' + jobId + '/config', {}, function (cfg) {
+    http.get('/api/jobs/' + jobId + '/config').then(function (cfg) {
       self.setState({
         config: cfg
       })
     })
-
   }
 
-  componentDidMount () {
-    this.loadConfig()
-  }
+  render = () => {
 
-  render () {
-
-    const currentJob = this.props.job
-    const currentConfig = this.state.config
-
-    const {getFieldDecorator} = this.props.form
-    const formItemLayout = {
-      labelCol: {span: 6},
-      wrapperCol: {span: 14}
-    }
+    const {visible, config, submitting} = this.state
+    const {job, form} = this.props
 
     // job class tip
     const classInputTip = t('input') + t('jobs.class') + ' ' + t('jobs.class.exapmle')
-    const classDisable = !(currentJob.id === null || currentJob.id === undefined)
 
     // job cron tip
     const cronInputTip = t('input') + t('jobs.cron')
@@ -135,43 +132,38 @@ class JobEdit extends React.Component {
     const maxShardPullCountInputTip = t('input') + t('jobs.max.shard.pull.count')
 
     // job misfire
-    const misfireChecked = currentConfig.misfire
+    const misfireChecked = config.misfire
 
     // job timeout
     const timeoutInputTip = t('input') + t('jobs.timeout')
 
     // job states
-    const statusChecked = (currentJob.status !== undefined && currentJob.status === 1)
+    const statusChecked = (job.status !== undefined && job.status === 1)
 
     return (
       <Modal
         title={t('jobs.edit')}
         wrapClassName="vertical-center-modal"
+        confirmLoading={submitting}
+        afterClose={this.afterClose}
         cancelText={t('cancel')}
-        onCancel={() => this.handleCancel()}
+        onCancel={this.onCancel}
+        visible={visible}
         okText={t('submit')}
-        onOk={() => this.handleSubmit()}
-        closable={true}
-        visible={true}
-        width={680}
-        footer={[
-          <Button key="back" type="ghost" size="large" onClick={() => this.handleCancel()}>{t('cancel')}</Button>,
-          <Button key="submit" type="primary" size="large" loading={this.state.submitting} onClick={() => this.handleSubmit()}>
-            {t('submit')}
-          </Button>
-        ]}>
+        onOk={this.onOk}
+        width={680}>
 
         <Form autoComplete="off">
           <Tabs defaultActiveKey="1" type="card">
             <TabPane tab={t('jobs.basic.info')} key="1">
               <FormItem {...formItemLayout} label={t('jobs.class')} hasFeedback>
-                {getFieldDecorator('clazz', {
-                  initialValue: currentJob.clazz,
+                {form.getFieldDecorator('clazz', {
+                  initialValue: job.clazz,
                   rules: [
                     {required: true, validator: this.checkClassInput, message: classInputTip}
                   ]
                 })(
-                  <Input disabled={classDisable} placeholder={classInputTip}/>
+                  <Input disabled={!!job.id} placeholder={classInputTip}/>
                 )}
               </FormItem>
               <FormItem
@@ -179,8 +171,8 @@ class JobEdit extends React.Component {
                 label={t('jobs.cron')}
                 // extra="Seconds Minutes Hours DayofMonth Month DayofWeek Year"
                 hasFeedback>
-                {getFieldDecorator('cron', {
-                  initialValue: currentJob.cron,
+                {form.getFieldDecorator('cron', {
+                  initialValue: job.cron,
                   rules: [
                     {required: true, whitespace: true, message: cronInputTip}
                   ]
@@ -190,8 +182,8 @@ class JobEdit extends React.Component {
               </FormItem>
 
               <FormItem {...formItemLayout} label={t('jobs.desc')}>
-                {getFieldDecorator('desc', {
-                  initialValue: currentJob.desc || '',
+                {form.getFieldDecorator('desc', {
+                  initialValue: job.desc || '',
                   rules: [
                     {message: descInputTip}
                   ]
@@ -201,23 +193,21 @@ class JobEdit extends React.Component {
               </FormItem>
 
               <FormItem {...formItemLayout} label={t('enable.or.not')}>
-                {getFieldDecorator('status', {
+                {form.getFieldDecorator('status', {
                   initialValue: statusChecked,
                   rules: [
                     {required: true}
                   ]
                 })(
-                  <Switch defaultChecked={statusChecked}
-                          checkedChildren={t('on')}
-                          unCheckedChildren={t('off')}/>
+                  <Switch defaultChecked={statusChecked} checkedChildren={t('on')} unCheckedChildren={t('off')}/>
                 )}
               </FormItem>
 
             </TabPane>
             <TabPane tab={t('jobs.config.info')} key="2">
               <FormItem {...formItemLayout} label={t('jobs.params')}>
-                {getFieldDecorator('param', {
-                  initialValue: currentConfig.param,
+                {form.getFieldDecorator('param', {
+                  initialValue: config.param,
                   rules: [
                     {message: paramsInputTip}
                   ]
@@ -227,8 +217,8 @@ class JobEdit extends React.Component {
               </FormItem>
 
               <FormItem {...formItemLayout} label={t('jobs.shard.count')}>
-                {getFieldDecorator('shardCount', {
-                  initialValue: currentConfig.shardCount,
+                {form.getFieldDecorator('shardCount', {
+                  initialValue: config.shardCount,
                   rules: [
                     {required: true, message: shardCountInputTip}
                   ]
@@ -238,8 +228,8 @@ class JobEdit extends React.Component {
               </FormItem>
 
               <FormItem {...formItemLayout} label={t('jobs.shard.params')}>
-                {getFieldDecorator('shardParams', {
-                  initialValue: currentConfig.shardParams,
+                {form.getFieldDecorator('shardParams', {
+                  initialValue: config.shardParams,
                   rules: [
                     {message: shardParamsInputTip}
                   ]
@@ -249,8 +239,8 @@ class JobEdit extends React.Component {
               </FormItem>
 
               <FormItem {...formItemLayout} label={t('jobs.max.shard.pull.count')}>
-                {getFieldDecorator('maxShardPullCount', {
-                  initialValue: currentConfig.maxShardPullCount,
+                {form.getFieldDecorator('maxShardPullCount', {
+                  initialValue: config.maxShardPullCount,
                   rules: [
                     {required: true, message: maxShardPullCountInputTip}
                   ]
@@ -260,8 +250,8 @@ class JobEdit extends React.Component {
               </FormItem>
 
               <FormItem {...formItemLayout} label={t('jobs.timeout')}>
-                {getFieldDecorator('timeout', {
-                  initialValue: currentConfig.timeout || 0,
+                {form.getFieldDecorator('timeout', {
+                  initialValue: config.timeout || 0,
                   rules: [
                     {required: true, message: timeoutInputTip}
                   ]
@@ -271,7 +261,7 @@ class JobEdit extends React.Component {
               </FormItem>
 
               <FormItem {...formItemLayout} label={t('jobs.misfire')}>
-                {getFieldDecorator('misfire', {
+                {form.getFieldDecorator('misfire', {
                   initialValue: misfireChecked,
                   rules: [
                     {required: true}

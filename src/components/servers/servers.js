@@ -1,6 +1,6 @@
 import React from 'react'
 import { Button, Icon, Table, Tooltip } from 'antd'
-import { Ajax } from '../common/ajax'
+import http from '../common/http'
 import BreadTitle from '../common/bread-title'
 import ServerJobs from './server.jobs'
 import t from '../../i18n'
@@ -26,7 +26,7 @@ class Servers extends React.Component {
     const self = this
     self.setState({loading: true})
 
-    Ajax.get('/api/servers', {}, function (jsonData) {
+    http.get('/api/servers').then(function (jsonData) {
       self.setState({
         loading: false,
         servers: jsonData

@@ -1,9 +1,9 @@
-import { Button, Input, Table, message } from 'antd'
+import { Button, Input, Table } from 'antd'
 import BreadTitle from '../common/bread-title'
 import JobInstanceDetail from './job.instance.detail'
 import AppSelect from '../apps/app.select'
 import React from 'react'
-import { Ajax } from '../common/ajax'
+import http from '../common/http'
 import qs from 'query-string'
 import t from '../../i18n'
 
@@ -37,7 +37,7 @@ class JobInstances extends React.Component {
     jobClass = jobClass || ''
 
     self.setState({loading: true})
-    Ajax.get('/api/jobs/instances', {appId, jobClass, pageNo, pageSize}, function (jsonData) {
+    http.get('/api/jobs/instances', {appId, jobClass, pageNo, pageSize}).then(function (jsonData) {
       var d = jsonData
       self.setState({
         loading: false,
@@ -67,7 +67,7 @@ class JobInstances extends React.Component {
     }
   }
 
-  onRefresh () {
+  onRefresh = () => {
     const {appId, pagination, jobClass} = this.state
     this.loadJobInstances(appId, pagination.current, jobClass)
   }
@@ -78,7 +78,7 @@ class JobInstances extends React.Component {
     this.loadJobInstances(this.state.appId, 1, jobClass)
   }
 
-  expandedRowRender (instance) {
+  expandedRowRender = (instance) => {
     return instance.status === 4 ? (<p>{instance.cause}</p>) : null
   }
 
@@ -96,21 +96,18 @@ class JobInstances extends React.Component {
 
         <AppSelect onChange={(val) => this.onAppChange(val)}/>
 
-        <Search className="ml-3"
-                style={{width: 250}}
-                defaultValue={this.state.jobClass}
-                enterButton={true}
-                placeholder={t('input.classname')}
-                onSearch={(val) => this.onSearch(val)}
-                onChange={(e) => this.setState({jobClass: e.target.value.trim()})}
-                disabled={!this.state.appId}/>
+        <Search
+          className="ml-3"
+          style={{width: 250}}
+          defaultValue={this.state.jobClass}
+          enterButton={true}
+          placeholder={t('input.classname')}
+          onSearch={(val) => this.onSearch(val)}
+          onChange={(e) => this.setState({jobClass: e.target.value.trim()})}
+          disabled={!this.state.appId}
+        />
 
-        <Button className="ml-3"
-                type="primary"
-                onClick={() => this.onRefresh()}
-                disabled={disableLoad}>
-          {t('refresh')}
-        </Button>
+        <Button className="ml-3" type="primary" onClick={this.onRefresh} disabled={disableLoad}>{t('refresh')}</Button>
 
         <Table
           className="mt-3"
@@ -138,11 +135,11 @@ class JobInstances extends React.Component {
           onChange={(p) => this.onPageChange(p)}
           rowKey="id"/>
 
-        {detailInstance === null ? null :
-          <JobInstanceDetail
-            uri={`/api/jobs/instances/${detailInstance.id}`}
-            onCanceled={() => this.setState({detailInstance: null})}
-            onFailed={() => this.setState({detailInstance: null})}/>}
+        {detailInstance &&
+        <JobInstanceDetail
+          uri={`/api/jobs/instances/${detailInstance.id}`}
+          onCanceled={() => this.setState({detailInstance: null})}
+        />}
 
       </div>
     )

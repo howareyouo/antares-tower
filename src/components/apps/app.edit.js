@@ -1,53 +1,59 @@
-import { Button, Form, Input, Modal } from 'antd'
+import { Form, Input, Modal } from 'antd'
 import PropTypes from 'prop-types'
 import React from 'react'
-import { Ajax } from '../common/ajax'
+import http from '../common/http'
 import t from '../../i18n'
 
 const FormItem = Form.Item
+const formItemLayout = {
+  labelCol: {span: 6},
+  wrapperCol: {span: 14}
+}
 
 class AppEdit extends React.Component {
 
   constructor (props) {
     super(props)
     this.state = {
-      submitting: false
+      submitting: false,
+      visible: true
     }
   }
 
-  handleCancel () {
-    // parent callback
-    this.props.onCanceled()
+  onCancel = () => {
+    this.callback = this.props.onCanceled
+    this.setState({visible: false})
   }
 
-  handleSubmit () {
-
-    const self = this
-
-    // start submiting
-    self.setState({submitting: true})
-
+  onOk = () => {
     // validate form
-    self.props.form.validateFields((errors, values) => {
-      if (!errors) {
-
-        // submit validated pass
-        Ajax.post('/api/apps', values, function (jsonData) {
-
-          // stop submiting when post finished
-          self.setState({submitting: false});
-
-          // callback parent
-          (self.props.onSubmitted && self.props.onSubmitted())
-        })
-      } else {
-        // stop submiting when validate failed
-        self.setState({submitting: false})
+    this.props.form.validateFields((err, values) => {
+      if (err) {
+        return
       }
+      // start submiting
+      this.setState({submitting: true})
+      // submit validated pass
+      http.post('/api/apps', values).then(() => {
+
+        // stop submiting when post finished
+        this.setState({
+          submitting: false,
+          visible: false
+        })
+
+        // callback parent
+        this.callback = this.props.onSubmitted
+      }, () => this.setState({submitting: false}))
     })
   }
 
-  checkNameInput (rule, value, callback) {
+  afterClose = () => {
+    // parent callback
+    this.callback && this.callback()
+  }
+
+  checkNameInput = (rule, value, callback) => {
     if (/^[A-Za-z0-9_]+$/.test(value)) {
       callback()
     } else {
@@ -57,17 +63,12 @@ class AppEdit extends React.Component {
 
   render () {
 
-    const currentApp = this.props.app
+    const {submitting, visible} = this.state
 
-    const {getFieldDecorator} = this.props.form
-    const formItemLayout = {
-      labelCol: {span: 6},
-      wrapperCol: {span: 14}
-    }
+    const {app, form} = this.props
 
     // app name tip
     const nameInputTip = t('input') + ' ' + t('apps.name') + ' ' + t('name.tip')
-    const nameDisable = !(currentApp.id === null || currentApp.id === undefined)
 
     // app key tip
     const keyInputTip = t('input') + ' ' + t('apps.key')
@@ -78,51 +79,30 @@ class AppEdit extends React.Component {
     return (
       <Modal
         title={t('apps.edit')}
+        confirmLoading={submitting}
         wrapClassName="vertical-center-modal"
-        visible={true}
-        onOk={() => this.handleSubmit()}
-        onCancel={() => this.handleCancel()}
-        okText={t('submit')}
+        afterClose={this.afterClose}
         cancelText={t('cancel')}
-        closable={true}
-        footer={[
-          <Button key="back"
-                  type="ghost"
-                  size="large"
-                  onClick={() => this.handleCancel()}>
-            {t('cancel')}
-          </Button>,
-          <Button key="submit"
-                  type="primary"
-                  size="large"
-                  loading={this.state.submitting}
-                  onClick={() => this.handleSubmit()}>
-            {t('submit')}
-          </Button>
-        ]}>
-
+        onCancel={this.onCancel}
+        visible={visible}
+        okText={t('submit')}
+        onOk={this.onOk}>
         <Form autoComplete="off">
 
-          <FormItem
-            {...formItemLayout}
-            label={t('apps.name')}
-            hasFeedback>
-            {getFieldDecorator('appName', {
-              initialValue: currentApp.appName,
+          <FormItem label={t('apps.name')} {...formItemLayout} hasFeedback>
+            {form.getFieldDecorator('appName', {
+              initialValue: app.appName,
               rules: [
                 {required: true, validator: this.checkNameInput}
               ]
             })(
-              <Input disabled={nameDisable} placeholder={nameInputTip}/>
+              <Input disabled={!!app.id} placeholder={nameInputTip}/>
             )}
           </FormItem>
 
-          <FormItem
-            {...formItemLayout}
-            label={t('apps.key')}
-            hasFeedback>
-            {getFieldDecorator('appKey', {
-              initialValue: currentApp.appKey,
+          <FormItem label={t('apps.key')} {...formItemLayout} hasFeedback>
+            {form.getFieldDecorator('appKey', {
+              initialValue: app.appKey,
               rules: [
                 {required: true, whitespace: true, message: keyInputTip}
               ]
@@ -131,12 +111,9 @@ class AppEdit extends React.Component {
             )}
           </FormItem>
 
-
-          <FormItem
-            {...formItemLayout}
-            label={t('apps.desc')}>
-            {getFieldDecorator('appDesc', {
-              initialValue: currentApp.appDesc,
+          <FormItem label={t('apps.desc')} {...formItemLayout}>
+            {form.getFieldDecorator('appDesc', {
+              initialValue: app.appDesc,
               rules: [
                 {message: descInputTip}
               ]
@@ -146,7 +123,6 @@ class AppEdit extends React.Component {
           </FormItem>
 
         </Form>
-
       </Modal>
     )
   }
