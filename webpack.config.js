@@ -123,9 +123,8 @@ module.exports = {
       chunkFilename: dev ? '[id].css' : '[id].[hash:6].css'
     }),
     new HtmlWebPackPlugin({
-      template: './public/index.html',
-      filename: './index.html',
-      favicon: './public/favicon.ico'
+      template: 'public/index.html',
+      favicon: 'public/favicon.ico'
     })
   ]
 }

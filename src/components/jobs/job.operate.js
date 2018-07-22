@@ -13,21 +13,21 @@ class JobOperate extends React.PureComponent {
 
   onOk = () => {
     const {operate, suffix, job} = this.props
-    const uri = '/api/jobs/' + job.id + '/' + operate + (suffix ? '/' + suffix : '')
 
     // start submiting
     this.setState({confirming: true})
-    http.post(uri).then(() => {
+    http.post('/api/jobs/' + job.id + '/' + operate + (suffix ? '/' + suffix : '')).then(() => {
 
       // stop submiting when post finished
+      this.callback = this.props.onSubmitted
       this.setState({
         confirming: false,
         visible: false
       })
       message.success(t('operate.success'))
-      this.callback = this.props.onSubmitted
     }, () => {
       this.callback = this.props.onFailed
+      this.setState({confirming: false})
     })
   }
 

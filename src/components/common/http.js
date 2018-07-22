@@ -25,8 +25,7 @@ export const ajax = function (url, method, params) {
   if (params) {
     if (options.method === 'GET') {
       url += '?' + querystring.stringify(params)
-    } else if (options.method === 'POST') {
-      // headers
+    } else {
       var headers = new Headers()
       headers.append('Content-Type', 'application/json')
       options.headers = headers
@@ -36,27 +35,23 @@ export const ajax = function (url, method, params) {
 
   /* ajax with fetch API */
   return new Promise((resolve, reject) => {
-    fetch(url, options)
-      .then(function (response) {
-          if (response.ok) {
-            response.json().then(function (jsonResp) {
-              if (jsonResp.status === 200) {
-                resolve(jsonResp.data)
-              } else {
-                message.error(jsonResp.err || t('ajax.failed'))
-                reject(jsonResp.err)
-              }
-            }, reject)
+    fetch(url, options).then(function (response) {
+      if (response.ok) {
+        response.json().then(function (json) {
+          if (json.status === 200) {
+            resolve(json.data)
           } else {
-            message.error(response)
-            reject(response)
+            message.error(json.err || t('ajax.failed'))
+            reject(json.err)
           }
-        }, function (err) {
-          message.error(err)
-        }
-      )
+        })
+      } else {
+        throw new Error('Network response was not ok.')
+      }
+    }).catch(function (error) {
+      message.error('There has been a problem with your request: ', error.message)
+    })
   })
 }
 
 export default http
-

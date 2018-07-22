@@ -45,22 +45,26 @@ class JobAssign extends React.Component {
 
   onOk = () => {
     const self = this
-    var assignIpsStr = self.state.assignIps.length > 0 ? self.state.assignIps.join(',') : '-1'
+    const {assignIps} = this.state
+    const {job, onCanceled} = this.props
+    var assignIpsStr = assignIps.length > 0 ? assignIps.join(',') : '-1'
 
     // start submiting
     self.setState({submitting: true})
-    http.post('/api/jobs/' + self.props.job.id + '/assigns', {'assignIps': assignIpsStr}).then(function (jsonData) {
+    http.post('/api/jobs/' + job.id + '/assigns', {assignIps: assignIpsStr}).then(function (jsonData) {
 
-      // stop submiting when post finished
-      self.callback = self.props.onCanceled
+      console.log(jsonData)
+      self.callback = onCanceled
       self.setState({
         submitting: false,
         visible: false
       })
-      // success tip
       message.success(t('operate.success'))
     }, function (err) {
       message.error(err)
+      self.setState({
+        submitting: false
+      })
     })
   }
 
@@ -74,13 +78,12 @@ class JobAssign extends React.Component {
       return null
     }
 
-    var processes = []
-    for (var i = 0; i < record.processes.length; i++) {
-      processes.push(<li>{record.processes[i]}</li>)
-    }
-
     return (
-      <ul style={{marginLeft: 22}}>{processes}</ul>
+      <ul style={{marginLeft: 22}}>{
+        record.processes.map(r =>
+          <li>{r}</li>
+        )
+      }</ul>
     )
   }
 
