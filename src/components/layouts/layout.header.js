@@ -36,23 +36,23 @@ class LayoutHeader extends Component {
               style={{'fontSize': '16px', lineHeight: '64px'}}
               mode="horizontal"
               theme="dark">
-          <SubMenu key="apps" title={<span><Icon type="appstore"/>{t('apps.mgr')}</span>}>
+          <SubMenu key="apps" title={<span><Icon type="appstore"/>{t('app.management')}</span>}>
             <Menu.Item key="apps">
-              <Link to="/apps"><Icon type="bars"/>{t('apps.list')}</Link>
+              <Link to="/apps"><Icon type="bars"/>{t('app.list')}</Link>
             </Menu.Item>
           </SubMenu>
-          <SubMenu key="jobs" title={<span><Icon type="file-text"/>{t('jobs.mgr')}</span>}>
+          <SubMenu key="jobs" title={<span><Icon type="file-text"/>{t('job.management')}</span>}>
             <Menu.Item key="job-configs">
-              <Link to="/job-configs"><Icon type="bars"/>{t('jobs.configs')}</Link>
+              <Link to="/job-configs"><Icon type="bars"/>{t('job.config')}</Link>
             </Menu.Item>
             <Menu.Item key="job-controls">
-              <Link to="/job-controls"><Icon type="line-chart"/>{t('jobs.controls')}</Link>
+              <Link to="/job-controls"><Icon type="line-chart"/>{t('job.control')}</Link>
             </Menu.Item>
             <Menu.Item key="job-instances">
               <Link to="/job-instances"><Icon type="copy"/>{t('jobs.instances')}</Link>
             </Menu.Item>
           </SubMenu>
-          <SubMenu key="clusters" title={<span><Icon type="windows"/>{t('clusters.mgr')}</span>}>
+          <SubMenu key="clusters" title={<span><Icon type="windows"/>{t('clusters.management')}</span>}>
             <Menu.Item key="servers">
               <Link to="/servers"><Icon type="laptop"/>{t('clusters.servers')}</Link>
             </Menu.Item>

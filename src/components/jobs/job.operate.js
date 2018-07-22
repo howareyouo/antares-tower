@@ -47,7 +47,7 @@ class JobOperate extends React.PureComponent {
 
     return (
       <Modal
-        title={t('jobs.' + operate)}
+        title={t('job.' + operate)}
         wrapClassName="vertical-center-modal"
         afterClose={this.afterClose}
         cancelText={t('cancel')}
@@ -56,7 +56,7 @@ class JobOperate extends React.PureComponent {
         onOk={this.onOk}
         visible={visible}
         confirmLoading={confirming}>
-        {t('jobs.' + operate + '.confirm')}
+        {t('job.' + operate + '.confirm')}
       </Modal>
     )
   }

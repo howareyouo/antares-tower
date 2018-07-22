@@ -106,7 +106,7 @@ class JobDependence extends React.Component {
 
     const self = this
     const job = this.props.job
-    const title = t('jobs.dependence', job.clazz)
+    const title = t('job.dependence', job.clazz)
 
     // next job ids tip
     const {addingJobIds, operatingJob, deletingJobId, visible} = this.state
@@ -124,7 +124,7 @@ class JobDependence extends React.Component {
 
         <Input.Search
           className="mb-3"
-          placeholder={t('input') + t('jobs.next.ids')}
+          placeholder={t('input') + t('job.next.ids')}
           enterButton={t('add')}
           onChange={(e) => this.nextJobIdsChange(e)}
           onSearch={this.onAdd}
@@ -135,9 +135,9 @@ class JobDependence extends React.Component {
         <Table
           columns={[
             {title: t('id'), dataIndex: 'id', key: 'id', width: '12%'},
-            {title: t('apps.name'), dataIndex: 'appName', key: 'appName', width: '18%'},
+            {title: t('app.name'), dataIndex: 'appName', key: 'appName', width: '18%'},
             {
-              title: t('jobs.class'), dataIndex: 'jobClass', key: 'jobClass', width: '55%',
+              title: t('job.class'), dataIndex: 'jobClass', key: 'jobClass', width: '55%',
               render: text => <code>{text}</code>
             },
             {

@@ -49,10 +49,10 @@ class JobAssign extends React.Component {
 
     // start submiting
     self.setState({submitting: true})
-    http.post('/api/jobs/' + self.props.job.id + '/assigns', {'assignIps': assignIpsStr}, function (jsonData) {
+    http.post('/api/jobs/' + self.props.job.id + '/assigns', {'assignIps': assignIpsStr}).then(function (jsonData) {
 
       // stop submiting when post finished
-      this.callback = this.props.onCanceled
+      self.callback = self.props.onCanceled
       self.setState({
         submitting: false,
         visible: false
@@ -92,7 +92,7 @@ class JobAssign extends React.Component {
 
     return (
       <Modal
-        title={t('jobs.assign', job.clazz)}
+        title={t('job.assign', job.clazz)}
         wrapClassName="vertical-center-modal"
         confirmLoading={submitting}
         afterClose={this.afterClose}
@@ -105,7 +105,7 @@ class JobAssign extends React.Component {
         <Table
           columns={[
             {title: t('ip'), dataIndex: 'ip', key: 'ip', width: '40%'},
-            {title: t('jobs.assign.inst'), render: (text, record) => <span>{record.processes.length}</span>}
+            {title: t('job.assign.inst'), render: (text, record) => <span>{record.processes.length}</span>}
           ]}
           rowSelection={{
             onChange: function (selectedRowKeys, selectedRows) {

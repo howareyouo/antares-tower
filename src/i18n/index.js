@@ -31,7 +31,6 @@ export default function (code, args) {
   if (txt) {
     return args ? format(txt, args) : txt
   } else {
-    var split = code.split('.')
-    return split.map(capitalize)
+    return code.split('.').map(capitalize).join(' ')
   }
 }

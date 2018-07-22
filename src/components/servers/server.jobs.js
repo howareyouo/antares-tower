@@ -49,7 +49,7 @@ export default class ServerJobs extends React.Component {
         <Table
           columns={[
             {title: t('id'), dataIndex: 'id', key: 'id'},
-            {title: t('jobs.class'), dataIndex: 'clazz', key: 'clazz', render: text => <code>{text}</code>},
+            {title: t('job.class'), dataIndex: 'clazz', key: 'clazz', render: text => <code>{text}</code>},
             {
               title: t('status'), key: 'status', render (text, record) {
                 const statusDesc = record.status === 1 ? t('enable') : t('disable')

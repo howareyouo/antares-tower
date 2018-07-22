@@ -43,7 +43,7 @@ class Clients extends React.Component {
     return (
       <div>
 
-        <BreadTitle firstCode="clusters.mgr" secondCode="clusters.clients"/>
+        <BreadTitle firstCode="clusters.management" secondCode="clusters.clients"/>
 
         <AppSelect onChange={(value) => this.loadClients(value)}/>
         <Button type="primary" onClick={() => this.onRefresh()} className="ml-3">
@@ -53,7 +53,7 @@ class Clients extends React.Component {
         <Table
           className="mt-3"
           columns={[
-            {title: t('clients.addr'), dataIndex: 'addr', key: 'addr'},
+            {title: t('client.address'), dataIndex: 'addr', key: 'addr'},
             {
               title: t('operation'), key: 'operation', render (text, record) {
                 return (

@@ -20,8 +20,8 @@ export default class AppSelect extends Component {
   }
 
   onChange = (value) => {
-    this.setState({value})
     this.props.onChange(value)
+    this.setState({value})
   }
 
   loadApps () {
@@ -46,7 +46,7 @@ export default class AppSelect extends Component {
     return (
       <Select style={{width: 220}}
               value={value}
-              placeholder={t('apps.select')}
+              placeholder={t('app.select')}
               optionFilterProp="children"
               notFoundContent={t('not.found')}
               onChange={this.onChange}

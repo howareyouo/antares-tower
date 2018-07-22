@@ -127,7 +127,7 @@ class JobConfigs extends React.Component {
 
     return (
       <div>
-        <BreadTitle firstCode="jobs.mgr" secondCode="jobs.configs"/>
+        <BreadTitle firstCode="job.management" secondCode="job.config"/>
 
         <div>
 
@@ -150,11 +150,11 @@ class JobConfigs extends React.Component {
           columns={[
             {title: t('id'), dataIndex: 'id', key: 'id', className: 'keep-word'},
             {
-              title: t('jobs.class'), dataIndex: 'clazz', key: 'clazz', render (text, job) {
+              title: t('job.class'), dataIndex: 'clazz', key: 'clazz', render (text, job) {
                 return <NavLink to={'/job-instances?jobClass=' + job.clazz}><code>{text}</code></NavLink>
               }
             },
-            {title: t('jobs.cron'), dataIndex: 'cron', key: 'cron', render: (text) => <code>{text}</code>},
+            {title: t('job.cron'), dataIndex: 'cron', key: 'cron', render: (text) => <code>{text}</code>},
             {title: t('desc'), dataIndex: 'desc', key: 'desc'},
             {
               title: t('status'), key: 'status',
@@ -182,11 +182,11 @@ class JobConfigs extends React.Component {
                 var menu = (
                   <Menu>
                     <Menu.Item key="1" onClick={() => self.setState({assigningJob: job})}>
-                      <Icon type="pushpin-o"/> {t('jobs.assigns')}</Menu.Item>
+                      <Icon type="pushpin-o"/> {t('job.assigns')}</Menu.Item>
                     <Menu.Item key="2" onClick={() => self.setState({dependencingJob: job})}>
-                      <Icon type="share-alt"/> {t('jobs.dependence.config')}</Menu.Item>
+                      <Icon type="share-alt"/> {t('job.dependence.config')}</Menu.Item>
                     <Menu.Item key="3">
-                      <NavLink to={'/job-instances?jobClass=' + job.clazz}><Icon type="clock-circle-o"/> {t('jobs.instances')}</NavLink>
+                      <NavLink to={'/job-instances?jobClass=' + job.clazz}><Icon type="clock-circle-o"/> {t('job.history')}</NavLink>
                     </Menu.Item>
                     <Menu.Divider/>
                     <Menu.Item key="4" onClick={() => self.onDelete(job)}>

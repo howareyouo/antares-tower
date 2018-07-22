@@ -5,9 +5,10 @@ import BreadTitle from '../common/bread-title'
 import AppSelect from '../apps/app.select'
 import JobOperate from './job.operate'
 import JobInstanceDetail from './job.instance.detail'
-import http from '../common/http'
-import t from '../../i18n'
 import { states } from '../common/constans'
+import http from '../common/http'
+import {shorten} from '../common/util'
+import t from '../../i18n'
 
 const Search = Input.Search
 
@@ -127,7 +128,7 @@ class JobControls extends React.Component {
     this.loadJobs(appId, 1, this.state.searchJobClass)
   }
 
-  renderJobExtra (record) {
+  renderJobExtra = (record) => {
     return (
       <span><code className="mr-3">{record.cron}</code>{record.desc}</span>
     )
@@ -145,7 +146,7 @@ class JobControls extends React.Component {
     return (
       <div>
 
-        <BreadTitle firstCode="jobs.mgr" secondCode="jobs.controls"/>
+        <BreadTitle firstCode="job.management" secondCode="job.control"/>
 
         <div>
 
@@ -166,14 +167,14 @@ class JobControls extends React.Component {
           columns={[
             {title: t('id'), dataIndex: 'id', key: 'id', width: '5%'},
             {
-              title: t('jobs.class'), dataIndex: 'clazz', key: 'clazz', render (text, job) {
-                return <NavLink to={'/job-instances?jobClass=' + job.clazz}><code>{text}</code></NavLink>
+              title: t('job.class'), dataIndex: 'clazz', key: 'clazz', render (text, job) {
+                return <NavLink title={text} to={'/job-instances?jobClass=' + job.clazz}><code>{shorten(text)}</code></NavLink>
               }
             },
-            {title: t('jobs.fire.time.prev'), dataIndex: 'prevFireTime', key: 'prevFireTime'},
-            {title: t('jobs.fire.time'), dataIndex: 'fireTime', key: 'fireTime', width: '13%'},
-            {title: t('jobs.fire.time.next'), dataIndex: 'nextFireTime', key: 'nextFireTime'},
-            {title: t('jobs.scheduler'), dataIndex: 'scheduler', key: 'scheduler'},
+            {title: t('job.fire.time.prev'), dataIndex: 'prevFireTime', key: 'prevFireTime'},
+            {title: t('job.fire.time'), dataIndex: 'fireTime', key: 'fireTime', width: '13%'},
+            {title: t('job.fire.time.next'), dataIndex: 'nextFireTime', key: 'nextFireTime'},
+            {title: t('job.scheduler'), dataIndex: 'scheduler', key: 'scheduler'},
             {title: t('status'), render: (text, job) => <Badge status={states[job.state]} text={job.stateDesc}/>},
             {
               title: t('operation'), render (text, record) {

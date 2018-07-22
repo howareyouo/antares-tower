@@ -72,7 +72,7 @@ class Servers extends React.Component {
     return (
       <div>
 
-        <BreadTitle firstCode="clusters.mgr" secondCode="clusters.servers"/>
+        <BreadTitle firstCode="clusters.management" secondCode="clusters.servers"/>
 
         <Button className="mb-3" type="primary" onClick={() => this.onRefresh()}>
           {t('refresh')}
@@ -92,7 +92,7 @@ class Servers extends React.Component {
             },
             {title: t('host'), dataIndex: 'server', key: 'server', width: '20%'},
             {
-              title: t('jobs.count'), key: 'jobCount', width: '20%',
+              title: t('job.count'), key: 'jobCount', width: '20%',
               render (text, record) {
                 var jobCount = record.jobCount === null ? 'N/A' : record.jobCount
                 return (
@@ -107,7 +107,7 @@ class Servers extends React.Component {
               render (text, record) {
                 return (
                   <span>
-                    <a href="#" onClick={() => self.onListServerJobs(record)}>{t('servers.jobs.list')}</a>
+                    <a href="#" onClick={() => self.onListServerJobs(record)}>{t('job.list')}</a>
                   </span>
                 )
               }

@@ -1,17 +1,16 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { Breadcrumb } from 'antd'
 import t from '../../i18n'
 
-export default class BreadTitle extends Component {
+export default class BreadTitle extends PureComponent {
 
   render () {
-    const firstTitle = t(this.props.firstCode)
-    const secondTitle = t(this.props.secondCode)
+    const {firstCode, secondCode} = this.props
 
     return (
       <Breadcrumb>
-        <Breadcrumb.Item>{firstTitle}</Breadcrumb.Item>
-        <Breadcrumb.Item>{secondTitle}</Breadcrumb.Item>
+        <Breadcrumb.Item>{t(firstCode)}</Breadcrumb.Item>
+        <Breadcrumb.Item>{t(secondCode)}</Breadcrumb.Item>
       </Breadcrumb>
     )
   }

@@ -68,17 +68,17 @@ class AppEdit extends React.Component {
     const {app, form} = this.props
 
     // app name tip
-    const nameInputTip = t('input') + ' ' + t('apps.name') + ' ' + t('name.tip')
+    const nameInputTip = t('input') + ' ' + t('app.name') + ' ' + t('name.tip')
 
     // app key tip
-    const keyInputTip = t('input') + ' ' + t('apps.key')
+    const keyInputTip = t('input') + ' ' + t('app.key')
 
     // app desc tip
-    const descInputTip = t('input') + ' ' + t('apps.desc')
+    const descInputTip = t('input') + ' ' + t('app.description')
 
     return (
       <Modal
-        title={t('apps.edit')}
+        title={t('app.edit')}
         confirmLoading={submitting}
         wrapClassName="vertical-center-modal"
         afterClose={this.afterClose}
@@ -89,7 +89,7 @@ class AppEdit extends React.Component {
         onOk={this.onOk}>
         <Form autoComplete="off">
 
-          <FormItem label={t('apps.name')} {...formItemLayout} hasFeedback>
+          <FormItem label={t('app.name')} {...formItemLayout} hasFeedback>
             {form.getFieldDecorator('appName', {
               initialValue: app.appName,
               rules: [
@@ -100,7 +100,7 @@ class AppEdit extends React.Component {
             )}
           </FormItem>
 
-          <FormItem label={t('apps.key')} {...formItemLayout} hasFeedback>
+          <FormItem label={t('app.key')} {...formItemLayout} hasFeedback>
             {form.getFieldDecorator('appKey', {
               initialValue: app.appKey,
               rules: [
@@ -111,7 +111,7 @@ class AppEdit extends React.Component {
             )}
           </FormItem>
 
-          <FormItem label={t('apps.desc')} {...formItemLayout}>
+          <FormItem label={t('app.description')} {...formItemLayout}>
             {form.getFieldDecorator('appDesc', {
               initialValue: app.appDesc,
               rules: [

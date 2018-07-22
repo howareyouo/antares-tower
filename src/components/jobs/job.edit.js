@@ -111,38 +111,38 @@ class JobEdit extends React.Component {
     const {job, form} = this.props
 
     // job class tip
-    const classInputTip = t('input') + t('jobs.class') + ' ' + t('jobs.class.exapmle')
+    const classInputTip = t('input') + t('job.class') + ' ' + t('job.class.exapmle')
 
     // job cron tip
-    const cronInputTip = t('input') + t('jobs.cron')
+    const cronInputTip = t('input') + t('job.cron')
 
     // job desc
-    const descInputTip = t('input') + t('jobs.desc')
+    const descInputTip = t('input') + t('job.desc')
 
     // job params
-    const paramsInputTip = t('input') + t('jobs.params')
+    const paramsInputTip = t('input') + t('job.params')
 
     // job shard count
-    const shardCountInputTip = t('input') + t('jobs.shard.count')
+    const shardCountInputTip = t('input') + t('job.shard.count')
 
     // job shard params
-    const shardParamsInputTip = t('input') + t('jobs.shard.params') + ', ' + t('jobs.shard.params.exapmle')
+    const shardParamsInputTip = t('input') + t('job.shard.params') + ', ' + t('job.shard.params.exapmle')
 
     // job max shard pull count
-    const maxShardPullCountInputTip = t('input') + t('jobs.max.shard.pull.count')
+    const maxShardPullCountInputTip = t('input') + t('job.max.shard.pull.count')
 
     // job misfire
     const misfireChecked = config.misfire
 
     // job timeout
-    const timeoutInputTip = t('input') + t('jobs.timeout')
+    const timeoutInputTip = t('input') + t('job.timeout')
 
     // job states
     const statusChecked = (job.status !== undefined && job.status === 1)
 
     return (
       <Modal
-        title={t('jobs.edit')}
+        title={t('job.edit')}
         wrapClassName="vertical-center-modal"
         confirmLoading={submitting}
         afterClose={this.afterClose}
@@ -155,8 +155,8 @@ class JobEdit extends React.Component {
 
         <Form autoComplete="off">
           <Tabs defaultActiveKey="1" type="card">
-            <TabPane tab={t('jobs.basic.info')} key="1">
-              <FormItem {...formItemLayout} label={t('jobs.class')} hasFeedback>
+            <TabPane tab={t('job.basic.info')} key="1">
+              <FormItem {...formItemLayout} label={t('job.class')} hasFeedback>
                 {form.getFieldDecorator('clazz', {
                   initialValue: job.clazz,
                   rules: [
@@ -168,7 +168,7 @@ class JobEdit extends React.Component {
               </FormItem>
               <FormItem
                 {...formItemLayout}
-                label={t('jobs.cron')}
+                label={t('job.cron')}
                 // extra="Seconds Minutes Hours DayofMonth Month DayofWeek Year"
                 hasFeedback>
                 {form.getFieldDecorator('cron', {
@@ -181,7 +181,7 @@ class JobEdit extends React.Component {
                 )}
               </FormItem>
 
-              <FormItem {...formItemLayout} label={t('jobs.desc')}>
+              <FormItem {...formItemLayout} label={t('job.desc')}>
                 {form.getFieldDecorator('desc', {
                   initialValue: job.desc || '',
                   rules: [
@@ -204,8 +204,8 @@ class JobEdit extends React.Component {
               </FormItem>
 
             </TabPane>
-            <TabPane tab={t('jobs.config.info')} key="2">
-              <FormItem {...formItemLayout} label={t('jobs.params')}>
+            <TabPane tab={t('job.config.info')} key="2">
+              <FormItem {...formItemLayout} label={t('job.params')}>
                 {form.getFieldDecorator('param', {
                   initialValue: config.param,
                   rules: [
@@ -216,7 +216,7 @@ class JobEdit extends React.Component {
                 )}
               </FormItem>
 
-              <FormItem {...formItemLayout} label={t('jobs.shard.count')}>
+              <FormItem {...formItemLayout} label={t('job.shard.count')}>
                 {form.getFieldDecorator('shardCount', {
                   initialValue: config.shardCount,
                   rules: [
@@ -227,7 +227,7 @@ class JobEdit extends React.Component {
                 )}
               </FormItem>
 
-              <FormItem {...formItemLayout} label={t('jobs.shard.params')}>
+              <FormItem {...formItemLayout} label={t('job.shard.params')}>
                 {form.getFieldDecorator('shardParams', {
                   initialValue: config.shardParams,
                   rules: [
@@ -238,7 +238,7 @@ class JobEdit extends React.Component {
                 )}
               </FormItem>
 
-              <FormItem {...formItemLayout} label={t('jobs.max.shard.pull.count')}>
+              <FormItem {...formItemLayout} label={t('job.max.shard.pull.count')}>
                 {form.getFieldDecorator('maxShardPullCount', {
                   initialValue: config.maxShardPullCount,
                   rules: [
@@ -249,7 +249,7 @@ class JobEdit extends React.Component {
                 )}
               </FormItem>
 
-              <FormItem {...formItemLayout} label={t('jobs.timeout')}>
+              <FormItem {...formItemLayout} label={t('job.timeout')}>
                 {form.getFieldDecorator('timeout', {
                   initialValue: config.timeout || 0,
                   rules: [
@@ -260,7 +260,7 @@ class JobEdit extends React.Component {
                 )}
               </FormItem>
 
-              <FormItem {...formItemLayout} label={t('jobs.misfire')}>
+              <FormItem {...formItemLayout} label={t('job.misfire')}>
                 {form.getFieldDecorator('misfire', {
                   initialValue: misfireChecked,
                   rules: [

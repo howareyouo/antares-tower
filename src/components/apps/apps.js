@@ -67,8 +67,8 @@ export default class Apps extends Component {
   deleteConfirm = (app) => {
     const self = this
     Modal.confirm({
-      title: t('apps.delete'),
-      content: t('apps.delete.confirm', app.appName),
+      title: t('app.delete'),
+      content: t('app.delete.confirm', app.appName),
       okText: t('confirm'),
       cancelText: t('cancel'),
       maskClosable: true,
@@ -91,8 +91,8 @@ export default class Apps extends Component {
     return (
       <div>
         <Breadcrumb>
-          <Breadcrumb.Item>{t('apps.mgr')}</Breadcrumb.Item>
-          <Breadcrumb.Item>{t('apps.list')}</Breadcrumb.Item>
+          <Breadcrumb.Item>{t('app.management')}</Breadcrumb.Item>
+          <Breadcrumb.Item>{t('app.list')}</Breadcrumb.Item>
         </Breadcrumb>
 
         <Search
