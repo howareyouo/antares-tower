@@ -1,6 +1,6 @@
-import { Button, Divider, Icon, Input, Modal, Table } from 'antd'
-import BreadTitle from '../common/bread-title'
+import { Alert, Button, Divider, Icon, Input, Modal, Table } from 'antd'
 import JobInstanceDetail from './job.instance.detail'
+import BreadTitle from '../common/bread-title'
 import React, { Component } from 'react'
 import http from '../common/http'
 import t from '../../i18n'
@@ -29,7 +29,12 @@ class JobInstances extends Component {
   }
 
   loadJobInstances (jobId = this.state.jobId, pageNo = 1) {
-    const {pageSize, jobClass} = this.state
+
+    if (!jobId) {
+      return
+    }
+
+    const {pageSize} = this.state
 
     var requests = [
       http.get(`/api/jobs/${jobId}/instances`, {pageNo, pageSize}),
@@ -60,7 +65,6 @@ class JobInstances extends Component {
 
   onSearch = (jobId) => {
     jobId = jobId.trim()
-    if (!jobId) return
     this.loadJobInstances(jobId, 1)
   }
 
@@ -97,7 +101,6 @@ class JobInstances extends Component {
   render () {
 
     const {jobId, jobClass, instance} = this.state
-    const disableLoad = !jobId
 
     return (
       <div>
@@ -113,15 +116,18 @@ class JobInstances extends Component {
           onChange={(e) => this.setState({jobId: e.target.value.trim()})}
         />
 
-        <Button className="ml-3" type="primary" onClick={this.onRefresh} disabled={disableLoad}>
+        <Button className="ml-3" type="primary" onClick={this.onRefresh} disabled={!jobId}>
           <Icon type="reload"/>{t('refresh')}
         </Button>
 
-        <span className="ml-3">已加载：<code>{jobClass}</code></span>
-
-        <Button className="float-right" type="danger" onClick={() => this.onClean()} disabled={disableLoad}>
-          <Icon type="warning"/>{t('instances.clean')}
-        </Button>
+        {jobClass && <Alert className="mt-3" message={
+          <div>
+            {t('job.loaded', jobClass)}
+            <a className="float-right text-purple" onClick={this.onClean}>
+              <Icon type="warning"/> {t('instances.clean')}
+            </a>
+          </div>
+        } type="info" showIcon/>}
 
         <Table
           className="mt-3"
@@ -146,17 +152,14 @@ class JobInstances extends Component {
               )
             }
           ]}
+          expandedRowRender={this.expandedRowRender}
           pagination={this.state.pagination}
           dataSource={this.state.instances}
-          loading={this.state.loading}
-          expandedRowRender={this.expandedRowRender}
           onChange={this.onPageChange}
+          loading={this.state.loading}
           rowKey="id"/>
 
-        {instance && <JobInstanceDetail
-          uri={'/api/jobs/instances/' + instance.id}
-          onCanceled={() => this.setState({instance: null})}/>}
-
+        {instance && <JobInstanceDetail uri={'/api/jobs/instances/' + instance.id} onCanceled={() => this.setState({instance: null})}/>}
       </div>
     )
   }

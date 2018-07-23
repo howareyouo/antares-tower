@@ -10,10 +10,10 @@ export default {
   'app.select': 'Select App',
   'app.key': 'App Secret Key',
   'app.inherit': 'Inherit Configs From App',
-  'app.delete.confirm': 'Sure to delete the app【{0}】and delete all configurations of it?',
+  'app.delete.confirm': 'Sure to delete the app [{0}] and delete all configurations of it ?',
 
   'clusters.servers': 'Server List',
-  'clusters.servers.jobs': 'Server[{0}]\'s jobs',
+  'clusters.servers.jobs': 'Server [{0}] \'s jobs',
   'clusters.clients': 'Client List',
 
   'back.home': 'Back to home',
@@ -25,9 +25,8 @@ export default {
 
   'id': 'ID',
   'ip': 'IP',
-  'input': 'Please Input',
   'input.fullname': 'Input Full Name',
-  'input.job': 'Input Job ID',
+  'input.job': 'Input Job\'s ID',
 
   'instances.clean': 'Clean Instances',
   'instances.clean.confirm': 'Do you want to clean all these instances ?',
@@ -51,6 +50,8 @@ export default {
   'job.trigger': 'Trigger Job',
   'job.pause': 'Pause Job',
   'job.resume': 'Resume Job',
+  'job.loaded': 'Loaded Job:  [{0}] ',
+
   'job.disable': 'Disable Job',
   'job.enable': 'Enable Job',
   'job.delete': 'Delete Job',
@@ -58,20 +59,23 @@ export default {
   'job.stop': 'Stop Job',
   'job.terminate': 'Terminate Job',
   'job.del_next': 'Delete the next job',
-  'job.trigger.confirm': 'Sure to trigger the job?',
-  'job.pause.confirm': 'Sure to pause the job?',
-  'job.resume.confirm': 'Sure to resume the job?',
-  'job.disable.confirm': 'Sure to disable the job?',
+  'job.trigger.confirm': 'Sure to trigger the job ?',
+  'job.pause.confirm': 'Sure to pause the job ?',
+  'job.resume.confirm': 'Sure to resume the job ?',
+  'job.disable.confirm': 'Sure to disable the job ?',
   'job.enable.confirm': 'Sure to enable the job?',
-  'job.delete.confirm': 'Sure to delete the job?',
-  'job.schedule.confirm': 'Sure to schedule the job?',
+  'job.delete.confirm': '{0}Sure to delete the job ?',
+  'job.schedule.confirm': 'Sure to schedule the job ?',
   'job.stop.confirm': 'Sure to stop the job?',
-  'job.del_next.confirm': 'Sure to delete the next job?',
-  'job.terminate.confirm': 'Sure to terminate the current job instance?',
+  'job.del_next.confirm': 'Sure to delete the next job ?',
+  'job.terminate.confirm': 'Sure to terminate the current job instance ?',
+
   'job.fire.time.prev': 'Previous FireTime',
   'job.fire.time': 'Current FireTime',
   'job.fire.time.next': 'Next FireTime',
+
   'job.scheduler': 'Schedule Server',
+
   'job.instance.detail': 'Instance Detail',
   'job.instance.running.info': 'Running Progress',
   'job.instance.shards.info': 'Shards Detail',
@@ -89,10 +93,10 @@ export default {
   'job.instance.shard.param': 'Shard Param',
   'job.config.info': 'Config Info',
   'job.basic.info': 'Basic Info',
-  'job.dependence': '[{0}]\'s Next Jobs',
+  'job.dependence': ' [{0}] \'s Next Jobs',
   'job.dependence.config': 'Dependence Config',
   'job.next.ids': 'Next Job Ids, e.g., 123,456',
-  'job.assign': 'Assign【{0}】\'s clients',
+  'job.assign': 'Assign [{0}] \'s clients',
   'job.assigns': 'Assign Client',
   'job.assign.inst': 'Instance Number',
 
@@ -101,7 +105,7 @@ export default {
   'off': 'OFF',
 
   'servers.shutdown': 'Shutdown Server',
-  'servers.shutdown.confirm': 'Sure to shutdown the server【{0}】?',
+  'servers.shutdown.confirm': 'Sure to shutdown the server [{0}]  ?',
 
   'table.start.time': 'Start Time',
   'table.end.time': 'End Time',

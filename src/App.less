@@ -52,16 +52,24 @@ code {
 code, .keep-word {
   word-break: keep-all;
 }
-.align-middle {vertical-align: middle}
-.text-truncate {overflow: hidden;text-overflow: ellipsis;white-space: nowrap}
+.d-flex,
+.flex-middle,
+.flex-center { display: flex }
+.flex-middle { align-items: center }
+.flex-center { justify-content: center }
+.align-middle {vertical-align: middle }
+.text-truncate {overflow: hidden;text-overflow: ellipsis;white-space: nowrap }
+.ml-auto { margin-left: auto }
 .mt-3 { margin-top: 1rem}
 .mb-3 { margin-bottom: 1rem}
 .mr-3 { margin-right: 1rem}
-.ml-3 { margin-left: 1rem}
+.mr-4 { margin-right: 1.5rem}
+.ml-3 { margin-left: 1rem !important }
 .mr-2 { margin-right: .5rem}
 .ml-2 { margin-left: .5rem}
 .mt-2 { margin-top: .5rem}
 .mb-0 { margin-bottom: 0 !important}
+.text-normal,
 .status-1, // job instance status NEW
 .state-0, // job state 停用
 .shard-0 // job instance shard NEW
@@ -75,6 +83,7 @@ code, .keep-word {
 .state-2, // job state 执行中
 .shard-1 // job instance shard RUNNING
 {color: @blue-6}
+.text-warning,
 .status-6, // job instance status TIMEOUT_CLOSED
 .state-3 // job state 停止
 {color: @gold-6}
@@ -83,6 +92,7 @@ code, .keep-word {
 .state-4, // job state 执行失败
 .shard-3 // job instance shard FAILED
 {color: @red-6}
+.text-yellow,
 .status-5, // job instance status TERMINATED
 .state-5 // job state 暂停
 {color: @yellow-6}

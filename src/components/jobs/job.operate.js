@@ -1,70 +1,35 @@
 import { message, Modal } from 'antd'
-import PropTypes from 'prop-types'
-import React from 'react'
 import http from '../common/http'
 import t from '../../i18n'
 
-class JobOperate extends React.PureComponent {
+var icons = {
+  terminate: 'exclamation-circle-o',
+  del_next: 'delete',
+  schedule: 'clock-circle-o',
+  trigger: 'rocket',
+  delete: 'delete',
+  enable: 'check-circle-o',
+  resume: 'forward',
+  pause: 'pause',
+  stop: 'poweroff'
+}
 
-  state = {
-    confirming: false,
-    visible: true
-  }
-
-  onOk = () => {
-    const {operate, suffix, job} = this.props
-
-    // start submiting
-    this.setState({confirming: true})
-    http.post('/api/jobs/' + job.id + '/' + operate + (suffix ? '/' + suffix : '')).then(() => {
-
-      // stop submiting when post finished
-      this.callback = this.props.onSubmitted
-      this.setState({
-        confirming: false,
-        visible: false
-      })
-      message.success(t('operate.success'))
-    }, () => {
-      this.callback = this.props.onFailed
-      this.setState({confirming: false})
+const operate = function (operate, job, cb, suffix) {
+  Modal.confirm({
+    title: t('job.' + operate),
+    content: t('job.' + operate + '.confirm', job.clazz),
+    cancelText: t('cancel'),
+    okText: t('confirm'),
+    iconType: icons[operate],
+    maskClosable: true,
+    onOk: () => new Promise((resolve, reject) => {
+      http.post('/api/jobs/' + job.id + '/' + operate + (suffix ? '/' + suffix : '')).then(() => {
+        message.success(t('operate.success'))
+        cb && cb()
+        resolve()
+      }, reject)
     })
-  }
-
-  afterClose = () => {
-    // callback parent
-    this.callback && this.callback()
-  }
-
-  onCancel = () => {
-    this.callback = this.props.onCanceled
-    this.setState({visible: false})
-  }
-
-  render () {
-    const {operate} = this.props
-    const {visible, confirming} = this.state
-
-    return (
-      <Modal
-        title={t('job.' + operate)}
-        wrapClassName="vertical-center-modal"
-        afterClose={this.afterClose}
-        cancelText={t('cancel')}
-        onCancel={this.onCancel}
-        okText={t('confirm')}
-        onOk={this.onOk}
-        visible={visible}
-        confirmLoading={confirming}>
-        {t('job.' + operate + '.confirm')}
-      </Modal>
-    )
-  }
+  })
 }
 
-JobOperate.propTypes = {
-  operate: PropTypes.string.isRequired,
-  job: PropTypes.object.isRequired
-}
-
-export default JobOperate
+export default operate

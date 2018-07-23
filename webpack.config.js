@@ -58,7 +58,7 @@ module.exports = {
       {
         test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
         type: 'javascript/auto',
-        use: [{
+        use:  [{
           loader: 'url-loader',
           options: {
             limit: 8192
@@ -68,7 +68,7 @@ module.exports = {
       {
         test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
         type: 'javascript/auto',
-        use: [{
+        use:  [{
           loader: 'url-loader',
           options: {
             limit: 10000
@@ -86,7 +86,7 @@ module.exports = {
             // directory for faster rebuilds.
             cacheDirectory: true,
             plugins: [
-              ['import', {'libraryName': 'antd', 'libraryDirectory': 'es', 'style': true}],
+              ['import', {'libraryName': 'antd', 'libraryDirectory': 'es', 'style': true}] ,
               'react-hot-loader/babel'
             ]
           }

@@ -13,7 +13,7 @@ export default {
   'app.name': '应用名称',
   'app.description': '应用描述',
   'app.key': '应用密钥',
-  'app.delete.confirm': '确定要删除应用【{0}】，并删除其所有配置吗？',
+  'app.delete.confirm': '确定要删除应用 [{0}] ，并删除其所有配置吗？',
   'app.inherit': '继承应用配置',
 
   'back.home': '返回首页',
@@ -24,7 +24,7 @@ export default {
   'client.address': '客户端地址',
   'clusters.management': '集群管理',
   'clusters.servers': '服务器列表',
-  'clusters.servers.jobs': '服务器【{0}】调度的任务',
+  'clusters.servers.jobs': '服务器 [{0}] 调度的任务',
   'clusters.clients': '客户端列表',
 
   'desc': '描述',
@@ -40,6 +40,7 @@ export default {
   'finished': '完成',
 
   'host': '主机',
+
 
   'id': '编号',
   'ip': 'IP',
@@ -80,12 +81,12 @@ export default {
   'job.del_next': '删除后置任务',
   'job.terminate': '终止任务',
   'job.trigger.confirm': '确定要触发一次该任务吗，操作后任务将执行一次？',
-  'job.pause.confirm': '确定要暂停执行该任务吗，暂停后任务将不被调度，可通过【恢复】操作重新调度？',
+  'job.pause.confirm': '确定要暂停执行该任务吗，暂停后任务将不被调度，可通过[ 恢复 ]操作重新调度？',
   'job.resume.confirm': '确定要恢复执行该任务吗，恢复后任务将开始调度？',
-  'job.disable.confirm': '确定要停用该任务吗，停用后任务将不再被调度，可通过【启用】操作重新调度',
+  'job.disable.confirm': '确定要停用该任务吗，停用后任务将不再被调度，可通过[启用]操作重新调度',
   'job.enable.confirm': '确定要启用该任务吗，启用后任务将开始调度？',
-  'job.delete.confirm': '确定要删除该任务吗？',
-  'job.stop.confirm': '确定要停止该任务吗，停止后任务不再被调度，可通过【调度】操作重新调度？',
+  'job.delete.confirm': '{0}确定要删除该任务吗？',
+  'job.stop.confirm': '确定要停止该任务吗，停止后任务不再被调度，可通过[调度]操作重新调度？',
   'job.schedule.confirm': '确定要开始调度该任务吗，之后任务将开始调度？',
   'job.del_next.confirm': '确定要删除该后置任务？',
   'job.terminate.confirm': '确定要终止当前任务实例吗？',
@@ -96,6 +97,7 @@ export default {
   'job.instance.detail': '实例详情',
   'job.config.info': '配置信息',
   'job.basic.info': '基本信息',
+  'job.loaded': '已加载任务:  [{0}] ',
 
   'job.instance.running.info': '运行进度',
   'job.instance.shards.info': '分片详情',
@@ -111,14 +113,13 @@ export default {
   'job.instance.shard.finish.client': '完成客户端：',
   'job.instance.shard.pull.count': '拉取次数：',
   'job.instance.shard.pull.time': '拉取时间：',
-  'job.dependence': '【{0}】的后置任务',
+  'job.dependence': ' [{0}] 的后置任务',
   'job.dependence.config': '依赖配置',
   'job.next.ids': '后置任务ID, 如123',
-  'job.assign': '指定【{0}】的客户端',
+  'job.assign': '指定 [{0}] 的客户端',
   'job.assigns': '指定客户端',
   'job.assign.inst': '实例数',
 
-  'pause': '暂停',
   'monitor': '监控',
   'more': '更多',
   'not.found': '未找到记录',
@@ -130,6 +131,8 @@ export default {
   'on': 'ON',
   'off': 'OFF',
 
+  'pause': '暂停',
+
   'resume': '恢复',
   'refresh': '刷新',
 
@@ -140,9 +143,9 @@ export default {
   'switch': '切换',
   'status': '状态',
   'servers.clean.cache': '清除服务器缓存',
-  'servers.clean.cache.confirm': '确定要清除服务器【{0}】的缓存吗？',
+  'servers.clean.cache.confirm': '确定要清除服务器 [{0}] 的缓存吗？',
   'servers.shutdown': '关闭服务器',
-  'servers.shutdown.confirm': '确定要关闭服务器【{0}】吗？',
+  'servers.shutdown.confirm': '确定要关闭服务器 [{0}] 吗？',
   'shutdown': '关闭',
 
   'terminate': '终止',
