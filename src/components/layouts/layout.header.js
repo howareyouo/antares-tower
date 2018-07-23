@@ -49,7 +49,7 @@ class LayoutHeader extends Component {
               <Link to="/job-controls"><Icon type="line-chart"/>{t('job.control')}</Link>
             </Menu.Item>
             <Menu.Item key="job-instances">
-              <Link to="/job-instances"><Icon type="copy"/>{t('jobs.instances')}</Link>
+              <Link to="/job-instances"><Icon type="copy"/>{t('job.history')}</Link>
             </Menu.Item>
           </SubMenu>
           <SubMenu key="clusters" title={<span><Icon type="windows"/>{t('clusters.management')}</span>}>

@@ -18,7 +18,8 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: dev ? '[name].js' : '[name].[hash:6].js',
-    chunkFilename: dev ? '[id].js' : '[id].[hash:6].js'
+    chunkFilename: dev ? '[id].js' : '[id].[hash:6].js',
+    publicPath: '/'
   },
   // see https://webpack.github.io/docs/webpack-dev-server.html
   devServer: {

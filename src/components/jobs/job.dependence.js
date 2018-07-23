@@ -1,10 +1,11 @@
-import { Button, Input, Modal, Table } from 'antd'
-import React from 'react'
+import { Button, Input, Modal, Table, Icon } from 'antd'
+import React, { Component } from 'react'
 import JobOperate from './job.operate'
 import http from '../common/http'
+import {shorten} from '../common/util'
 import t from '../../i18n'
 
-class JobDependence extends React.Component {
+class JobDependence extends Component {
 
   state = {
     deletingJobId: null,
@@ -134,16 +135,16 @@ class JobDependence extends React.Component {
 
         <Table
           columns={[
-            {title: t('id'), dataIndex: 'id', key: 'id', width: '12%'},
-            {title: t('app.name'), dataIndex: 'appName', key: 'appName', width: '18%'},
+            {title: t('id'), dataIndex: 'id', key: 'id'},
+            {title: t('app.name'), dataIndex: 'appName', key: 'appName'},
             {
-              title: t('job.class'), dataIndex: 'jobClass', key: 'jobClass', width: '55%',
-              render: text => <code>{text}</code>
+              title: t('job.class'), dataIndex: 'jobClass', key: 'jobClass',
+              render: text => <code>{shorten(text)}</code>
             },
             {
               title: t('operation'), key: 'operation', render (text, record) {
                 return (
-                  <a onClick={() => self.onDelete(record)}>{t('delete')}</a>
+                  <a onClick={() => self.onDelete(record)}><Icon type="delete" /> {t('delete')}</a>
                 )
               }
             }
@@ -161,9 +162,9 @@ class JobDependence extends React.Component {
             job={operatingJob}
             operate="del_next"
             suffix={deletingJobId}
-            onSubmitted={() => this.onDeleteSubmitted()}
-            onCanceled={() => this.onDeleteCanceled()}
-            onFailed={() => this.onDeleteFailed()}/>
+            onSubmitted={this.onDeleteSubmitted}
+            onCanceled={this.onDeleteCanceled}
+            onFailed={this.onDeleteFailed}/>
         }
       </Modal>
     )

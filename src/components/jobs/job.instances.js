@@ -1,95 +1,93 @@
-import { Button, Icon, Input, Modal, Table } from 'antd'
+import { Button, Divider, Icon, Input, Modal, Table } from 'antd'
 import BreadTitle from '../common/bread-title'
 import JobInstanceDetail from './job.instance.detail'
-import AppSelect from '../apps/app.select'
-import React from 'react'
+import React, { Component } from 'react'
 import http from '../common/http'
-import qs from 'querystring'
 import t from '../../i18n'
 
 const Search = Input.Search
 
-class JobInstances extends React.Component {
+class JobInstances extends Component {
 
   constructor (props) {
     super(props)
-    var jobClass = qs.parse(props.location.search.substr(1)).jobClass
+    var jobId = props.match.params.id || ''
     this.state = {
-      detailInstance: null,
       pagination: false,
       instances: [],
+      instance: null,
       pageSize: 10,
-      jobClass,
       loading: false,
-      appId: null
+      jobClass: '',
+      preJobId: jobId,
+      jobId
     }
   }
 
-  loadJobInstances (appId, pageNo, jobClass) {
-    const pageSize = this.state.pageSize
-    const self = this
-
-    self.setState({loading: true})
-    http.get('/api/jobs/instances', {appId, jobClass, pageNo, pageSize}).then(function (jsonData) {
-      var d = jsonData
-      self.setState({
-        instances: d.data,
-        loading: false,
-        jobClass,
-        appId,
-        pagination: {
-          pageSize,
-          current: pageNo,
-          total: d.total,
-          showTotal: total => t('total', total)
-        }
-      })
-    }, function () {
-      self.setState({loading: false})
-    })
+  componentDidMount () {
+    this.loadJobInstances()
   }
 
-  onAppChange = (appId) => {
-    this.setState({appId: appId}, () => {
-      if (this.state.jobClass) {
-        this.onSearch(this.state.jobClass)
-      }
-    })
+  loadJobInstances (jobId = this.state.jobId, pageNo = 1) {
+    const {pageSize, jobClass} = this.state
+
+    var requests = [
+      http.get(`/api/jobs/${jobId}/instances`, {pageNo, pageSize}),
+      http.get(`/api/jobs/${jobId}`)
+    ]
+
+    this.setState({loading: true})
+    Promise.all(requests).then(([inss, detail]) => {
+      this.setState({
+        pagination: {
+          total: inss.total,
+          current: pageNo,
+          pageSize,
+          showTotal: total => t('total', total)
+        },
+        instances: inss.data,
+        jobClass: detail ? detail.job.clazz : '',
+        loading: false,
+        jobId
+      })
+    }, () => this.setState({loading: false}))
   }
 
   onRefresh = () => {
-    const {appId, pagination, jobClass} = this.state
-    this.loadJobInstances(appId, pagination.current, jobClass)
+    const {jobId, pagination} = this.state
+    this.loadJobInstances(jobId, pagination.current)
   }
 
-  onSearch = (jobClass) => {
-    jobClass = jobClass.trim()
-    if (!jobClass) return
-    this.loadJobInstances(this.state.appId, 1, jobClass)
+  onSearch = (jobId) => {
+    jobId = jobId.trim()
+    if (!jobId) return
+    this.loadJobInstances(jobId, 1)
   }
 
-  onClean = () => {
-
-    const {jobId, jobClass} = this.state
-
+  onClean = (insId) => {
     Modal.confirm({
-      title: 'Do you want to delete these items?',
-      content: 'When clicked the OK button, this dialog will be closed after 1 second',
+      title: t('instances.clean'),
+      content: t('instances.clean.confirm'),
+      cancelText: t('cancel'),
+      okText: t('confirm'),
       maskClosable: true,
-      onOk () {
+      onOk: () => {
+        const {jobId} = this.state
         return new Promise((resolve, reject) => {
-          http.delete('/api/jobs/' + 5 + '/instances').then(res => {
-            console.log(res)
+          var url = insId ?
+            '/api/jobs/instances/' + insId :
+            '/api/jobs/' + jobId + '/instances'
+          http.delete(url).then(() => {
+            this.onRefresh()
             resolve()
           }, reject)
-          // setTimeout(Math.random() > 0.5 ? resolve : reject, 1000)
         })
       }
     })
   }
 
   onPageChange = (p) => {
-    this.loadJobInstances(this.state.appId, p.current, this.state.jobClass)
+    this.loadJobInstances(this.state.jobId, p.current)
   }
 
   expandedRowRender = (instance) => {
@@ -98,33 +96,31 @@ class JobInstances extends React.Component {
 
   render () {
 
-    const {appId, jobClass, detailInstance} = this.state
-    const disableLoad = (!appId || !jobClass)
+    const {jobId, jobClass, instance} = this.state
+    const disableLoad = !jobId
 
     return (
       <div>
 
         <BreadTitle firstCode="job.management" secondCode="job.history"/>
 
-        <AppSelect onChange={this.onAppChange}/>
-
         <Search
-          className="ml-3"
           style={{width: 250}}
-          placeholder={t('input.classname')}
-          defaultValue={jobClass}
+          placeholder={t('input.job')}
+          defaultValue={jobId}
           enterButton={true}
           onSearch={this.onSearch}
-          onChange={(e) => this.setState({jobClass: e.target.value.trim()})}
-          disabled={!appId}
+          onChange={(e) => this.setState({jobId: e.target.value.trim()})}
         />
 
         <Button className="ml-3" type="primary" onClick={this.onRefresh} disabled={disableLoad}>
-          <Icon type="reload" />{t('refresh')}
+          <Icon type="reload"/>{t('refresh')}
         </Button>
 
-        <Button className="float-right" type="danger" onClick={this.onClean} disabled={disableLoad}>
-          <Icon type="delete"/>{t('job.history.clean')}
+        <span className="ml-3">已加载：<code>{jobClass}</code></span>
+
+        <Button className="float-right" type="danger" onClick={() => this.onClean()} disabled={disableLoad}>
+          <Icon type="warning"/>{t('instances.clean')}
         </Button>
 
         <Table
@@ -136,13 +132,17 @@ class JobInstances extends React.Component {
             {title: t('table.cost.time'), dataIndex: 'costTime', key: 'costTime'},
             {title: t('table.trigger.type'), dataIndex: 'triggerTypeDesc', key: 'triggerTypeDesc'},
             {
-              title: t('status'), dataIndex: 'statusDesc', key: 'statusDesc', render: (text, job) => (
-                <span className={'status-' + job.status}>{text}</span>
+              title: t('status'), dataIndex: 'statusDesc', key: 'statusDesc', render: (text, ins) => (
+                <span className={'status-' + ins.status}>{text}</span>
               )
             },
             {
-              title: t('operation'), key: 'operation', render: (text, job) => (
-                <a onClick={() => this.setState({detailInstance: job})}>{t('job.instance.detail')}</a>
+              title: t('operation'), key: 'operation', render: (text, ins) => (
+                <div>
+                  <a onClick={() => this.setState({instance: ins})}><Icon type="profile"/> {t('job.instance.detail')}</a>
+                  <Divider type="vertical"/>
+                  <a onClick={() => this.onClean(ins.id)}><Icon type="delete"/> {t('delete')}</a>
+                </div>
               )
             }
           ]}
@@ -153,11 +153,9 @@ class JobInstances extends React.Component {
           onChange={this.onPageChange}
           rowKey="id"/>
 
-        {detailInstance &&
-        <JobInstanceDetail
-          uri={`/api/jobs/instances/${detailInstance.id}`}
-          onCanceled={() => this.setState({detailInstance: null})}
-        />}
+        {instance && <JobInstanceDetail
+          uri={'/api/jobs/instances/' + instance.id}
+          onCanceled={() => this.setState({instance: null})}/>}
 
       </div>
     )

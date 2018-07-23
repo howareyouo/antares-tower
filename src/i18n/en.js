@@ -26,8 +26,11 @@ export default {
   'id': 'ID',
   'ip': 'IP',
   'input': 'Please Input',
-  'input.fullname': 'Please Input Full Name',
-  'input.classname': 'Please Input Job Class Full Name',
+  'input.fullname': 'Input Full Name',
+  'input.job': 'Input Job ID',
+
+  'instances.clean': 'Clean Instances',
+  'instances.clean.confirm': 'Do you want to clean all these instances ?',
 
   'name.tip': '(A-Za-z0-9_)',
   'not.found': 'Not found records',
@@ -69,7 +72,7 @@ export default {
   'job.fire.time': 'Current FireTime',
   'job.fire.time.next': 'Next FireTime',
   'job.scheduler': 'Schedule Server',
-  'job.instance.detail': 'Job Instance Detail',
+  'job.instance.detail': 'Instance Detail',
   'job.instance.running.info': 'Running Progress',
   'job.instance.shards.info': 'Shards Detail',
   'job.instance.finish.percent': 'Finish Percent',
@@ -92,6 +95,7 @@ export default {
   'job.assign': 'Assign【{0}】\'s clients',
   'job.assigns': 'Assign Client',
   'job.assign.inst': 'Instance Number',
+
 
   'on': 'ON',
   'off': 'OFF',

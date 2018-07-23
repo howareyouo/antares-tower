@@ -1,8 +1,10 @@
 export default {
   '404': '未找到该页面',
+
   'add': '添加',
   'ajax.failed': '请求失败',
   'ajax.success': '请求成功',
+
   'app.management': '应用管理',
   'app.list': '应用列表',
   'app.edit': '编辑应用',
@@ -43,7 +45,10 @@ export default {
   'ip': 'IP',
   'input': '请输入',
   'input.fullname': '请输入全名称',
-  'input.classname': '请输入Job全类名',
+  'input.job': '请输入Job ID',
+  'instances.clean': '清空历史记录',
+  'instances.clean.confirm': '确定要清空所有实例记录吗？',
+
 
   'job.management': '任务管理',
   'job.config': '任务配置',
@@ -88,9 +93,10 @@ export default {
   'job.fire.time': '本次触发时间',
   'job.fire.time.next': '下次触发时间',
   'job.scheduler': '调度服务器',
-  'job.instance.detail': '任务实例详情',
+  'job.instance.detail': '实例详情',
   'job.config.info': '配置信息',
   'job.basic.info': '基本信息',
+
   'job.instance.running.info': '运行进度',
   'job.instance.shards.info': '分片详情',
   'job.instance.finish.percent': '完成百分比',
@@ -105,7 +111,6 @@ export default {
   'job.instance.shard.finish.client': '完成客户端：',
   'job.instance.shard.pull.count': '拉取次数：',
   'job.instance.shard.pull.time': '拉取时间：',
-  'job.history.clean': '清空任务实例详情',
   'job.dependence': '【{0}】的后置任务',
   'job.dependence.config': '依赖配置',
   'job.next.ids': '后置任务ID, 如123',
@@ -149,5 +154,5 @@ export default {
   'trigger': '触发',
 
   'update': '更新',
-  'value': '值',
+  'value': '值'
 }

@@ -21,7 +21,7 @@ export default class DefaultLayout extends Component {
         <LayoutHeader/>
         <Content style={{padding: '0 50px'}}>
           <Switch>
-            <Route path="/job-instances" component={JobInstances} />
+            <Route path="/job-instances/:id?" component={JobInstances} />
             <Route path="/job-controls" component={JobControls} />
             <Route path="/job-configs" component={JobConfigs} />
             <Route path="/servers" component={Servers}/>

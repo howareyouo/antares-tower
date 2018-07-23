@@ -7,7 +7,7 @@ import JobOperate from './job.operate'
 import JobInstanceDetail from './job.instance.detail'
 import { states } from '../common/constans'
 import http from '../common/http'
-import {shorten} from '../common/util'
+import { shorten } from '../common/util'
 import t from '../../i18n'
 
 const Search = Input.Search
@@ -22,47 +22,52 @@ class JobControls extends React.Component {
       pagination: false,
       pageSize: 10,
       appId: null,
-      searchJobClass: '',
       operatingJob: null,
       monitoringJob: null,
       operate: ''
     }
   }
 
-  loadJobs (appId, pageNo, jobClass) {
-
-    jobClass = jobClass || ''
+  loadJobs (appId, jobId = this.state.jobId, pageNo = 1) {
 
     const self = this
-    self.setState({loading: true})
-
     const pageSize = this.state.pageSize
 
-    http.get('/api/jobs/controls', {appId, jobClass, pageNo, pageSize}).then(function (jsonData) {
-      var d = jsonData
+    self.setState({loading: true})
+    http.get('/api/jobs/controls', {appId, jobId, pageNo, pageSize}).then(function (json) {
       self.setState({
         loading: false,
-        jobs: d.data,
-        appId: appId,
-        searchJobClass: jobClass,
+        jobs: json.data,
+        appId,
+        jobId,
         pagination: {
+          pageSize,
           current: pageNo,
-          total: d.total,
-          pageSize: pageSize,
+          total: json.total,
           showTotal: (total) => t('total', total)
         }
       })
     })
   }
 
-  onPageChange (p) {
-    this.loadJobs(this.state.appId, p.current)
+  onAppChange (appId) {
+    this.loadJobs(appId, this.state.jobId)
   }
 
-  onRefresh () {
-    const {appId, pagination, searchJobClass} = this.state
-    this.loadJobs(appId, pagination.current, searchJobClass)
+  onPageChange = (p) => {
+    const {appId, jobId} = this.state
+    this.loadJobs(appId, jobId, p.current)
   }
+
+  onRefresh = () => {
+    const {appId, jobId, pagination} = this.state
+    this.loadJobs(appId, jobId, pagination.current)
+  }
+
+  onSearch = (jobId) => {
+    this.loadJobs(this.state.appId, jobId)
+  }
+
 
   onEnable (job) {
     this.setState({operatingJob: job, operate: 'enable'})
@@ -96,79 +101,60 @@ class JobControls extends React.Component {
     this.setState({monitoringJob: job})
   }
 
-  onOperateSubmitted () {
+  onOperateSubmitted = () => {
     this.setState({operatingJob: null, operate: ''})
     this.onRefresh()
   }
 
-  onOperateCanceled () {
+  onOperateCanceled = () => {
     this.setState({operatingJob: null, operate: ''})
   }
 
-  onOperateFailed () {
-    this.setState({operatingJob: null, operate: ''})
-    this.onRefresh()
-  }
-
-  onMonitorCanceled () {
+  onMonitorCanceled = () => {
     this.setState({monitoringJob: null})
     this.onRefresh()
   }
 
-  onMonitorFailed () {
+  onMonitorFailed = () => {
     this.setState({monitoringJob: null})
     this.onRefresh()
   }
 
-  onSearch (jobClass) {
-    this.loadJobs(this.state.appId, 1, jobClass)
-  }
+  renderJobExtra = (record) => (
+    <span><code className="mr-3">{record.cron}</code>{record.desc}</span>
+  )
 
-  onAppChange (appId) {
-    this.loadJobs(appId, 1, this.state.searchJobClass)
-  }
+  render = () => {
 
-  renderJobExtra = (record) => {
-    return (
-      <span><code className="mr-3">{record.cron}</code>{record.desc}</span>
-    )
-  }
-
-  render () {
-
+    const {jobId, operate, operatingJob, monitoringJob} = this.state
     const self = this
-
-    const appId = this.state.appId
-    const operatingJob = this.state.operatingJob
-    const operate = this.state.operate
-    const monitoringJob = this.state.monitoringJob
 
     return (
       <div>
 
         <BreadTitle firstCode="job.management" secondCode="job.control"/>
 
-        <div>
+        <AppSelect onChange={(val) => this.onAppChange(val)}/>
 
-          <AppSelect onChange={(val) => this.onAppChange(val)}/>
+        <Search
+          className="ml-3"
+          style={{width: 250}}
+          placeholder={t('input.job')}
+          defaultValue={jobId}
+          enterButton={true}
+          onSearch={this.onSearch}
+          onChange={(e) => this.setState({jobId: e.target.value.trim()})}
+        />
 
-          <Search
-            className="ml-3"
-            style={{width: 250}}
-            placeholder={t('input.classname')}
-            enterButton={true}
-            onSearch={() => this.onSearch()} disabled={appId === null}/>
+        <Button className="ml-3" type="primary" onClick={() => this.onRefresh()}>{t('refresh')}</Button>
 
-          <Button className="ml-3" type="primary" onClick={() => this.onRefresh()}>{t('refresh')}</Button>
-
-        </div>
         <Table
           className="mt-3"
           columns={[
             {title: t('id'), dataIndex: 'id', key: 'id', width: '5%'},
             {
               title: t('job.class'), dataIndex: 'clazz', key: 'clazz', render (text, job) {
-                return <NavLink title={text} to={'/job-instances?jobClass=' + job.clazz}><code>{shorten(text)}</code></NavLink>
+                return <NavLink title={text} to={'/job-instances/' + job.id}><code>{shorten(text)}</code></NavLink>
               }
             },
             {title: t('job.fire.time.prev'), dataIndex: 'prevFireTime', key: 'prevFireTime'},
@@ -177,49 +163,47 @@ class JobControls extends React.Component {
             {title: t('job.scheduler'), dataIndex: 'scheduler', key: 'scheduler'},
             {title: t('status'), render: (text, job) => <Badge status={states[job.state]} text={job.stateDesc}/>},
             {
-              title: t('operation'), render (text, record) {
-                const state = record.state
+              title: t('operation'), render (text, job) {
+                const state = job.state
 
                 return (
                   <span>
-                    {state === 2 ? <a className="mr-2" onClick={() => self.onMonitor(record)}>{t('monitor')}</a> : null}
-                    {state === 0 ? <a className="mr-2" onClick={() => self.onEnable(record)}>{t('enable')}</a> : null}
-                    {state === 1 ? <a className="mr-2" onClick={() => self.onTrigger(record)}>{t('trigger')}</a> : null}
-                    {state === 1 || state === 2 || state === 4 ?
-                      <a className="mr-2" onClick={() => self.onPause(record)}>{t('pause')}</a> : null
+                    {state === 2 && <a className="mr-2" onClick={() => self.onMonitor(job)}>{t('monitor')}</a>}
+                    {state === 0 && <a className="mr-2" onClick={() => self.onEnable(job)}>{t('enable')}</a>}
+                    {state === 1 && <a className="mr-2" onClick={() => self.onTrigger(job)}>{t('trigger')}</a>}
+                    {(state === 1 || state === 2 || state === 4) &&
+                    <a className="mr-2" onClick={() => self.onPause(job)}>{t('pause')}</a>
                     }
-                    {state === 1 || state === 2 || state === 4 || state === 5 ?
-                      <a className="mr-2" onClick={() => self.onStopJob(record)}>{t('stop')}</a> : null
+                    {(state === 1 || state === 2 || state === 4 || state === 5) &&
+                    <a className="mr-2" onClick={() => self.onStopJob(job)}>{t('stop')}</a>
                     }
-                    {state === 5 ? <a className="mr-2" onClick={() => self.onResume(record)}>{t('resume')}</a> : null}
-                    {state === 3 ? <a className="mr-2" onClick={() => self.onSchedule(record)}>{t('schedule')}</a> : null}
-                    {state === 2 ? <a className="mr-2" onClick={() => self.onTerminateJob(record)}>{t('terminate')}</a> : null}
+                    {state === 5 && <a className="mr-2" onClick={() => self.onResume(job)}>{t('resume')}</a>}
+                    {state === 3 && <a className="mr-2" onClick={() => self.onSchedule(job)}>{t('schedule')}</a>}
+                    {state === 2 && <a className="mr-2" onClick={() => self.onTerminateJob(job)}>{t('terminate')}</a>}
                   </span>
                 )
               }
             }
           ]}
+          expandedRowRender={this.renderJobExtra}
+          pagination={this.state.pagination}
           dataSource={this.state.jobs}
           loading={this.state.loading}
-          pagination={this.state.pagination}
-          expandedRowRender={(record) => self.renderJobExtra(record)}
-          onChange={(p) => this.onPageChange(p)}
+          onChange={this.onPageChange}
           rowKey="id"
         />
 
-        {operatingJob === null ? null :
-          <JobOperate
-            job={operatingJob}
-            operate={operate}
-            onSubmitted={() => this.onOperateSubmitted()}
-            onCanceled={() => this.onOperateCanceled()}
-            onFailed={() => this.onOperateFailed()}/>}
+        {operatingJob && <JobOperate
+          job={operatingJob}
+          operate={operate}
+          onSubmitted={() => this.onOperateSubmitted()}
+          onCanceled={() => this.onOperateCanceled()}
+          onFailed={() => this.onOperateSubmitted()}/>}
 
-        {monitoringJob === null ? null :
-          <JobInstanceDetail
-            uri={`/api/jobs/${monitoringJob.id}/monitor`}
-            onCanceled={() => this.onMonitorCanceled()}
-            onFailed={() => this.onMonitorFailed()}/>}
+        {monitoringJob && <JobInstanceDetail
+          uri={`/api/jobs/${monitoringJob.id}/monitor`}
+          onCanceled={() => this.onMonitorCanceled()}
+          onFailed={() => this.onMonitorFailed()}/>}
 
       </div>
     )
