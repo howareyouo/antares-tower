@@ -24,18 +24,16 @@ export default class AppSelect extends Component {
     this.setState({value})
   }
 
-  loadApps () {
-    const self = this
-
+  loadApps (pageNo = 1, pageSize = 10000) {
     // load all apps
-    http.get('/api/apps', {pageNo: 1, pageSize: 10000}).then(response => {
-      var apps = response.data
+    http.get('/api/apps', {pageNo, pageSize}).then(resp => {
+      var apps = resp.data
       var state = {apps}
       if (apps.length) {
         state.value = apps[0].id
-        self.props.onChange(state.value)
+        this.props.onChange(state.value)
       }
-      self.setState(state)
+      this.setState(state)
     })
   }
 
@@ -44,15 +42,16 @@ export default class AppSelect extends Component {
     const {apps, value} = this.state
 
     return (
-      <Select style={{width: 220}}
-              value={value}
-              placeholder={t('app.select')}
-              optionFilterProp="children"
-              notFoundContent={t('not.found')}
-              onChange={this.onChange}
-              showSearch>
+      <Select
+        style={{width: 220}}
+        value={value}
+        placeholder={t('app.select')}
+        optionFilterProp="children"
+        notFoundContent={t('not.found')}
+        onChange={this.onChange}
+        showSearch>
 
-        {apps.map((app, index) => (
+        {apps.map(app => (
           <Option key={app.id} value={app.id}>{app.appName}</Option>
         ))}
 

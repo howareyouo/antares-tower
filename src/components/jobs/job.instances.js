@@ -123,7 +123,7 @@ class JobInstances extends Component {
         {jobClass && <Alert className="mt-3" message={
           <div>
             {t('job.loaded', jobClass)}
-            <a className="float-right text-purple" onClick={this.onClean}>
+            <a className="float-right text-purple" onClick={() => this.onClean()}>
               <Icon type="warning"/> {t('instances.clean')}
             </a>
           </div>
