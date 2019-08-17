@@ -1,6 +1,6 @@
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const HtmlWebPackPlugin = require('html-webpack-plugin')
-const apiMocker = require('webpack-api-mocker')
+const apiMocker = require('mocker-api');
 const webpack = require('webpack')
 const path = require('path')
 

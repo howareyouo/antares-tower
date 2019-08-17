@@ -23,18 +23,18 @@ class JobConfigs extends Component {
     loading: false,
     operate: '',
     appId: null,
-    jobId: null,
+    jobClass: null,
     jobs: []
   }
 
-  loadJobs = (appId, jobId, pageNo = 1) => {
+  loadJobs = (appId, jobClass, pageNo = 1) => {
 
     const self = this
     self.setState({loading: true})
 
     const pageSize = this.state.pageSize
 
-    http.get('/api/jobs', {appId, jobId, pageNo, pageSize}).then(function (jsonData) {
+    http.get('/api/jobs', {appId, jobClass, pageNo, pageSize}).then(function (jsonData) {
       var d = jsonData
       self.setState({
         loading: false,
@@ -43,7 +43,7 @@ class JobConfigs extends Component {
           return j
         }),
         appId,
-        jobId,
+        jobClass,
         pagination: {
           current: pageNo,
           total: d.total,
@@ -55,22 +55,22 @@ class JobConfigs extends Component {
   }
 
   onRefresh = () => {
-    const {appId, jobId, pagination} = this.state
-    this.loadJobs(appId, jobId, pagination.current)
+    const {appId, jobClass, pagination} = this.state
+    this.loadJobs(appId, jobClass, pagination.current)
   }
 
-  onSearch = (jobId) => {
+  onSearch = (jobClass) => {
     const {appId, pagination} = this.state
-    this.loadJobs(appId, jobId, pagination.current)
+    this.loadJobs(appId, jobClass, pagination.current)
   }
 
   onPageChange = (p) => {
-    const {appId, jobId} = this.state
-    this.loadJobs(appId, jobId, p.current)
+    const {appId, jobClass} = this.state
+    this.loadJobs(appId, jobClass, p.current)
   }
 
   onAppChange = (appId) => {
-    this.loadJobs(appId, this.state.jobId)
+    this.loadJobs(appId, this.state.jobClass)
   }
 
   onAdd = () => {

@@ -26,7 +26,7 @@ export default {
   'id': 'ID',
   'ip': 'IP',
   'input.fullname': 'Input Full Name',
-  'input.job': 'Input Job\'s ID',
+  'input.job': 'Input Job\'s Class or ID',
 
   'instances.clean': 'Clean Instances',
   'instances.clean.confirm': 'Do you want to clean all these instances ?',

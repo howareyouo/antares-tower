@@ -46,7 +46,7 @@ export default {
   'ip': 'IP',
   'input': '请输入',
   'input.fullname': '请输入全名称',
-  'input.job': '请输入Job ID',
+  'input.job': '请输入Job Class 或 ID',
   'instances.clean': '清空历史记录',
   'instances.clean.confirm': '确定要清空所有实例记录吗？',
 

@@ -148,7 +148,7 @@ const jobPagingNameData = {
 
 const jobConfigData = {
   'id': 1,
-  'jobId': 1,
+  'jobClass': 1,
   'misfire': true,
   'params': null,
   'shardCount': 4,
@@ -263,7 +263,7 @@ const clientsData = [
 ]
 
 const jobRunningInstanceData = {
-  'jobId': 1,
+  'jobClass': 1,
   'instanceId': 69,
   'status': 2,
   'statusDesc': '执行中',
@@ -349,7 +349,7 @@ const jobInstancesPagingData = {
   'data': [
     {
       'id': 226,
-      'jobId': 1,
+      'jobClass': 1,
       'status': 3,
       'statusDesc': '执行成功',
       'triggerTypeDesc': 'API触发',
@@ -361,7 +361,7 @@ const jobInstancesPagingData = {
     },
     {
       'id': 223,
-      'jobId': 1,
+      'jobClass': 1,
       'status': 3,
       'statusDesc': '执行成功',
       'triggerTypeDesc': 'API触发',
@@ -373,7 +373,7 @@ const jobInstancesPagingData = {
     },
     {
       'id': 220,
-      'jobId': 1,
+      'jobClass': 1,
       'status': 3,
       'statusDesc': '执行成功',
       'triggerTypeDesc': 'API触发',
@@ -385,7 +385,7 @@ const jobInstancesPagingData = {
     },
     {
       'id': 217,
-      'jobId': 1,
+      'jobClass': 1,
       'status': 3,
       'statusDesc': '执行成功',
       'triggerTypeDesc': '调度触发',
@@ -397,7 +397,7 @@ const jobInstancesPagingData = {
     },
     {
       'id': 214,
-      'jobId': 1,
+      'jobClass': 1,
       'status': 4,
       'statusDesc': '执行失败',
       'triggerTypeDesc': 'API触发',
@@ -409,7 +409,7 @@ const jobInstancesPagingData = {
     },
     {
       'id': 211,
-      'jobId': 1,
+      'jobClass': 1,
       'status': 3,
       'statusDesc': '执行成功',
       'triggerTypeDesc': 'API触发',
@@ -421,7 +421,7 @@ const jobInstancesPagingData = {
     },
     {
       'id': 208,
-      'jobId': 1,
+      'jobClass': 1,
       'status': 3,
       'statusDesc': '执行成功',
       'triggerTypeDesc': 'API触发',
@@ -433,7 +433,7 @@ const jobInstancesPagingData = {
     },
     {
       'id': 205,
-      'jobId': 1,
+      'jobClass': 1,
       'status': 3,
       'statusDesc': '执行成功',
       'triggerTypeDesc': 'API触发',
@@ -445,7 +445,7 @@ const jobInstancesPagingData = {
     },
     {
       'id': 202,
-      'jobId': 1,
+      'jobClass': 1,
       'status': 3,
       'statusDesc': '执行成功',
       'triggerTypeDesc': 'API触发',
@@ -457,7 +457,7 @@ const jobInstancesPagingData = {
     },
     {
       'id': 199,
-      'jobId': 1,
+      'jobClass': 1,
       'status': 3,
       'statusDesc': '执行成功',
       'triggerTypeDesc': '依赖触发',
